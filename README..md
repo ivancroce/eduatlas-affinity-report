@@ -182,7 +182,7 @@ CREATE DATABASE affinity_report_db;
 Create `application.properties`:
 
 ```properties
-spring.datasource.url=jdbc:postgresql://localhost:5432/affinity_report_db
+spring.datasource.url=jdbc:postgresql://localhost:5432/your_db
 spring.datasource.username=your_username
 spring.datasource.password=your_password
 
