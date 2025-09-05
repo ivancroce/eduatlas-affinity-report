@@ -44,7 +44,7 @@ public class ExcelImportService {
             if (name == null || name.isEmpty()) return null;
 
             // Skip if already exists
-            if (countryRepository.existsByName(name)) {
+            if (countryRepository.existsByNameIgnoreCase(name)) {
                 System.out.println("Country " + name + " already exists, skipping");
                 return null;
             }
