@@ -1,0 +1,27 @@
+$primary: #00275a;
+$secondary: #146ca8;
+$warning: #ffc107;
+$success: #28a745;
+$danger: #dc3545;
+
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+$background-gray: #e0e3eb;
+$card-gray: #f2f4f7;
+
+body {
+  font-family: "Lato", sans-serif;
+  background: $background-gray;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-card {
+  background-color: $card-gray;
+  border-radius: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}

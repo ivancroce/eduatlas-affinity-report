@@ -2,6 +2,7 @@ package com.ivancroce.backend.controllers;
 
 import com.ivancroce.backend.entities.User;
 import com.ivancroce.backend.exceptions.ValidationException;
+import com.ivancroce.backend.payloads.UserDetailDTO;
 import com.ivancroce.backend.payloads.UserRegistrationDTO;
 import com.ivancroce.backend.payloads.UserRespDTO;
 import com.ivancroce.backend.payloads.UserUpdateDTO;
@@ -27,15 +28,18 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public Page<User> findAllUsers(@RequestParam(defaultValue = "0") int page,
+    public Page<UserDetailDTO> findAllUsers(@RequestParam(defaultValue = "0") int page,
                                    @RequestParam(defaultValue = "10") int size,
                                    @RequestParam(defaultValue = "id") String sortBy) {
-        return userService.findAllUsers(page, size, sortBy);
+        Page<User> users = userService.findAllUsers(page, size, sortBy);
+        return users.map(UserDetailDTO::from);
     }
 
     @GetMapping("/{id}")
-    public User findUserById(@PathVariable Long id) {
-        return userService.findById(id);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public UserDetailDTO findUserById(@PathVariable Long id) {
+        User user = userService.findById(id);
+        return UserDetailDTO.from(user);
     }
 
     @GetMapping("/me")

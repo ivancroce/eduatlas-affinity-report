@@ -54,6 +54,10 @@ public class User  implements UserDetails {
         return this.email;
     }
 
+    public String getUsernameField() {
+        return this.username;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority(this.role.name()));
