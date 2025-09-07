@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../api/axios";
+
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,10 +23,7 @@ const LoginPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:3001/api/auth/login", {
-        email: email,
-        password: password
-      });
+      const response = await api.post("/auth/login", { email, password });
 
       console.log("Login successful!", response.data);
       const token = response.data.accessToken;

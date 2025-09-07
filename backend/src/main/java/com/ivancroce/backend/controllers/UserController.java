@@ -44,8 +44,8 @@ public class UserController {
 
     @GetMapping("/me")
     @PreAuthorize("hasAnyAuthority('STUDENT','ADMIN')")
-    public User getMyProfile(@AuthenticationPrincipal User currentUser) {
-        return currentUser;
+    public UserDetailDTO getMyProfile(@AuthenticationPrincipal User currentUser) {
+        return UserDetailDTO.from(currentUser);
     }
 
     @PostMapping

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Row, Col, Card, Spinner, Alert } from "react-bootstrap";
-import axios from "axios";
+import api from "../../api/axios";
 
 const DashboardPage = () => {
   const [users, setUsers] = useState([]);
@@ -15,11 +15,7 @@ const DashboardPage = () => {
           throw new Error("No access token found. Please login.");
         }
 
-        const response = await axios.get("http://localhost:3001/api/users", {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
+        const response = await api.get("/users");
 
         const sortedUsers = response.data.content.sort((a, b) => {
           const nameA = `${a.firstName} ${a.lastName}`.toLowerCase();
@@ -62,7 +58,7 @@ const DashboardPage = () => {
                 </Card.Title>
                 <Card.Text as="div">
                   <div>
-                    <strong>Username:</strong> {user.usernameField}
+                    <strong>Username:</strong> {user.username}
                   </div>
                   <div>
                     <strong>Email:</strong> {user.email}
