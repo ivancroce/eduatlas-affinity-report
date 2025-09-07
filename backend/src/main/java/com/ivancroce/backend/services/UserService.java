@@ -6,6 +6,7 @@ import com.ivancroce.backend.exceptions.BadRequestException;
 import com.ivancroce.backend.exceptions.NotFoundException;
 import com.ivancroce.backend.payloads.UserRegistrationDTO;
 import com.ivancroce.backend.payloads.UserRespDTO;
+import com.ivancroce.backend.payloads.UserUpdateDTO;
 import com.ivancroce.backend.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,5 +62,46 @@ public class UserService {
 
         User savedUser = userRepository.save(admin);
         return new UserRespDTO(savedUser.getId());
+    }
+
+    public UserRespDTO save(UserRegistrationDTO userDTO) {
+        userRepository.findByEmail(userDTO.email()).ifPresent(user -> {
+            throw new BadRequestException("The Email " + user.getEmail() + " is already in use!");
+        });
+        userRepository.findByUsername(userDTO.username()).ifPresent(user -> {
+            throw new BadRequestException("The username " + userDTO.username() + " is already in use!");
+        });
+
+        String encodedPassword = passwordEncoder.encode(userDTO.password());
+        User newUser = new User(userDTO.username(), userDTO.email(), encodedPassword,  Role.STUDENT, userDTO.firstName(), userDTO.lastName());
+
+        User savedUser = userRepository.save(newUser);
+        return new UserRespDTO(savedUser.getId());    }
+
+    public User findByIdAndUpdate(Long id, UserUpdateDTO userDTO) {
+        User found = this.findById(id);
+
+        if (!found.getUsername().equals(userDTO.username()) &&
+                userRepository.existsByUsername(userDTO.username())) {
+            throw new BadRequestException("Username '" + userDTO.username() + "' is already in use!");
+        }
+
+        found.setUsername(userDTO.username());
+        found.setFirstName(userDTO.firstName());
+        found.setLastName(userDTO.lastName());
+
+        if (userDTO.avatarUrl() != null && !userDTO.avatarUrl().isBlank()) {
+            found.setAvatarUrl(userDTO.avatarUrl());
+        } else {
+            found.setAvatarUrl("https://ui-avatars.com/api/?name=" +
+                    userDTO.firstName() + "+" + userDTO.lastName());
+        }
+
+        return userRepository.save(found);
+    }
+
+    public void findByIdAndDelete(Long id) {
+        User found = this.findById(id);
+        userRepository.delete(found);
     }
 }
