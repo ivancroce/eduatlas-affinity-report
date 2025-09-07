@@ -5,6 +5,7 @@ import com.ivancroce.backend.entities.User;
 import com.ivancroce.backend.exceptions.BadRequestException;
 import com.ivancroce.backend.exceptions.NotFoundException;
 import com.ivancroce.backend.payloads.CountryRegistrationDTO;
+import com.ivancroce.backend.payloads.CountryRespDTO;
 import com.ivancroce.backend.repositories.CountryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-@Slf4j
 public class CountryService {
 
     @Autowired
@@ -57,8 +59,7 @@ public class CountryService {
         }
 
         Country country = mapToEntity(dto);
-        Country savedCountry = countryRepository.save(country);
-        log.info("Successfully created country with id: {}", savedCountry.getId());
+
         return countryRepository.save(country);
     }
 
@@ -82,14 +83,19 @@ public class CountryService {
 
         updateCountryFromDto(existingCountry, dto);
 
-        log.info("Successfully updated country with id: {}", id);
         return countryRepository.save(existingCountry);
     }
 
     public void deleteCountry(Long id) {
         Country country = findById(id);
         countryRepository.delete(country);
-
-        log.info("Successfully deleted country: {} (id: {})", country.getName(), id);
     }
-}
+
+    public List<CountryRespDTO> findAllCountriesSimple() {
+
+        List<Country> countries = countryRepository.findAll(Sort.by("name"));
+
+        return countries.stream()
+                .map(country -> new CountryRespDTO(country.getId(), country.getName()))
+                .toList();
+}}

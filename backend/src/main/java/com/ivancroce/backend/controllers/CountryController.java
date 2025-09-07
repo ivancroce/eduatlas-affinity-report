@@ -3,6 +3,7 @@ package com.ivancroce.backend.controllers;
 import com.ivancroce.backend.entities.Country;
 import com.ivancroce.backend.exceptions.ValidationException;
 import com.ivancroce.backend.payloads.CountryRegistrationDTO;
+import com.ivancroce.backend.payloads.CountryRespDTO;
 import com.ivancroce.backend.services.CountryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,11 @@ public class CountryController {
     @GetMapping("/{id}")
     public Country getCountryById(@PathVariable Long id) {
         return countryService.findById(id);
+    }
+
+    @GetMapping("/simple")
+    public List<CountryRespDTO> getAllCountriesSimple() {
+        return countryService.findAllCountriesSimple();
     }
 
     @PostMapping
