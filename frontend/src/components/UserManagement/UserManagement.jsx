@@ -46,7 +46,7 @@ const DashboardPage = () => {
   return (
     <div>
       <div className="my-5">
-        <h1 className="mb-4 text-dark">User Dashboard</h1>
+        <h1 className="mb-4 text-dark">Users Management</h1>
       </div>
       <Row>
         {users.map((user) => (
@@ -56,18 +56,21 @@ const DashboardPage = () => {
                 <Card.Title className="mb-3">
                   {user.firstName} {user.lastName}
                 </Card.Title>
-                <Card.Text as="div">
-                  <div>
-                    <strong>Username:</strong> {user.username}
+                <Card.Text as="div" className="flex-grow-1">
+                  <div className="d-flex gap-2">
+                    <strong>Username:</strong> <span>{user.username}</span>
                   </div>
-                  <div>
-                    <strong>Email:</strong> {user.email}
+                  <div className="d-flex gap-2">
+                    <strong>Email:</strong> <span>{user.email}</span>
                   </div>
-                  <div>
-                    <strong>Role:</strong> {user.role}
+                  <div className="d-flex gap-2">
+                    <strong>Role:</strong> <span>{user.role}</span>
                   </div>
-                  <div>
-                    <strong>Avatar URL:</strong> {user.avatarUrl}
+                  <div className="d-flex gap-2">
+                    <strong>Avatar:</strong>
+                    <a href={user.avatarUrl} target="_blank" rel="noopener noreferrer" className="text-truncate">
+                      {user.avatarUrl}
+                    </a>
                   </div>
                 </Card.Text>
               </Card.Body>

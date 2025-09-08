@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
+import { jwtDecode } from "jwt-decode";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -30,7 +31,17 @@ const LoginPage = () => {
 
       localStorage.setItem("accessToken", token);
 
-      navigate("/dashboard");
+      const decoded = jwtDecode(token);
+      console.log("Token decoded:", decoded);
+      console.log("User role:", decoded.role);
+
+      const userRole = decoded.role;
+
+      if (userRole === "ADMIN") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/student-dashboard");
+      }
     } catch (err) {
       console.error("Login failed:", err);
 

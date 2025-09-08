@@ -4,8 +4,9 @@ import { Container } from "react-bootstrap";
 import MyFooter from "./components/MyFooter/MyFooter";
 import MyNavBar from "./components/MyNavBar/MyNavBar";
 import LoginPage from "./pages/LoginPage/LoginPage";
-import DashboardPage from "./pages/DashboardPage/DashboardPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
+import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
+import StudentDashboard from "./pages/StudentDashboard/StudentDashboard";
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
         <Container className="my-4">
           <Routes>
             <Route path="/" element={<LoginPage />} />
-            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/admin-dashboard" element={<AdminDashboard />} />
+            <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Container>
