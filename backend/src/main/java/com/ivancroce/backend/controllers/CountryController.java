@@ -7,6 +7,8 @@ import com.ivancroce.backend.payloads.CountryRegistrationDTO;
 import com.ivancroce.backend.payloads.CountryRespDTO;
 import com.ivancroce.backend.services.BachelorProgramService;
 import com.ivancroce.backend.services.CountryService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -27,22 +29,26 @@ public class CountryController {
     @Autowired
     private BachelorProgramService bachelorProgramService;
 
+    @Operation(summary = "Get a country by ID", description = "Retrieves a single country's details based on its unique identifier.")
     @GetMapping("/{id}")
     public Country getCountryById(@PathVariable Long id) {
         return countryService.findById(id);
     }
 
+    @Operation(summary = "Get simple countries list", description = "Returns list of countries for dropdown selection")
     @GetMapping("/simple")
     public List<CountryRespDTO> getAllCountriesSimple() {
         return countryService.findAllCountriesSimple();
     }
 
+    @Operation(summary = "Get representative program", description = "Get the standard bachelor program for affinity comparison")
     @GetMapping("/{countryId}/representative-program")
     public BachelorProgram getRepresentativeProgram(@PathVariable Long countryId) {
         return bachelorProgramService.getRepresentativeProgramForCountry(countryId);
     }
 
     @GetMapping("/{countryId}/programs")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public List<BachelorProgram> getProgramsByCountry(@PathVariable Long countryId) {
         return bachelorProgramService.findByCountryId(countryId);
     }

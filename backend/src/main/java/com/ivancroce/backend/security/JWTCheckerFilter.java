@@ -17,7 +17,6 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.UUID;
 
 @Component
 public class JWTCheckerFilter extends OncePerRequestFilter {
@@ -54,6 +53,29 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
         AntPathMatcher matcher = new AntPathMatcher();
         String path = request.getServletPath();
         String method = request.getMethod();
-        return new AntPathMatcher().match("/api/auth/**", request.getServletPath());
+
+        // Public auth endpoints
+        if (matcher.match("/api/auth/**", path)) {
+            return true;
+        }
+
+        // Public endpoints for the Affinity Report
+        if ("GET".equals(method)) {
+            if (matcher.match("/api/countries/simple", path) ||
+                    matcher.match("/api/countries/*/representative-program", path) ||
+                    matcher.match("/api/countries/*", path)) {
+                return true;
+            }
+        }
+
+        // Swagger UI public
+        if (matcher.match("/swagger-ui/**", path) ||
+                matcher.match("/api-docs/**", path) ||
+                matcher.match("/swagger-ui.html", path) ||
+                matcher.match("/v3/api-docs/**", path)) {
+            return true;
+        }
+
+        return false;
     }
 }
