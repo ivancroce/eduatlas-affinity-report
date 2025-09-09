@@ -1,13 +1,17 @@
 package com.ivancroce.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "countries")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "bachelorPrograms")
 @NoArgsConstructor
 public class Country {
     @Id
@@ -18,27 +22,15 @@ public class Country {
     private String name;
     @Column(nullable = false, name="years_compulsory_schooling")
     private Integer yearsCompulsorySchooling;
-    @Column(nullable = false, name="duration_ba")
-    private Integer durationBa;
-    @Column(nullable = false, name="credits_per_year")
-    private Integer creditsPerYear;
-    @Column(nullable = false, name="total_credits")
-    private Integer totalCredits;
     @Column(nullable = false, name="grading_system")
     private String gradingSystem;
-    @Column(nullable = false, name ="eqf_level")
-    private Integer eqfLevel;
-    @Column(nullable = false, name="official_denomination")
-    private String officialDenomination;
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<BachelorProgram> bachelorPrograms = new ArrayList<>();
 
-    public Country(String name, Integer yearsCompulsorySchooling, Integer durationBa, Integer creditsPerYear, String gradingSystem, Integer eqfLevel, String officialDenomination) {
+    public Country(String name, Integer yearsCompulsorySchooling, String gradingSystem) {
         this.name = name;
         this.yearsCompulsorySchooling = yearsCompulsorySchooling;
-        this.durationBa = durationBa;
-        this.creditsPerYear = creditsPerYear;
-        this.totalCredits = durationBa * creditsPerYear;
         this.gradingSystem = gradingSystem;
-        this.eqfLevel = eqfLevel;
-        this.officialDenomination = officialDenomination;
     }
 }

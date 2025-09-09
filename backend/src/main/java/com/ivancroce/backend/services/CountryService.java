@@ -1,13 +1,13 @@
 package com.ivancroce.backend.services;
 
 import com.ivancroce.backend.entities.Country;
-import com.ivancroce.backend.entities.User;
+
 import com.ivancroce.backend.exceptions.BadRequestException;
 import com.ivancroce.backend.exceptions.NotFoundException;
 import com.ivancroce.backend.payloads.CountryRegistrationDTO;
 import com.ivancroce.backend.payloads.CountryRespDTO;
 import com.ivancroce.backend.repositories.CountryRepository;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -38,24 +38,13 @@ public class CountryService {
         return new Country(
                 dto.name(),
                 dto.yearsCompulsorySchooling(),
-                dto.durationBa(),
-                dto.creditsPerYear(),
-                dto.gradingSystem(),
-                dto.eqfLevel(),
-                dto.officialDenomination()
+                dto.gradingSystem()
         );
     }
 
     public Country save(CountryRegistrationDTO dto) {
         if (countryRepository.existsByNameIgnoreCase(dto.name())) {
             throw new BadRequestException("Country with name '" + dto.name() + "' already exists");
-        }
-
-        if (dto.yearsCompulsorySchooling() + dto.durationBa() != 16) {
-            throw new BadRequestException(
-                    "Years of compulsory schooling (" + dto.yearsCompulsorySchooling() +
-                            ") + BA duration (" + dto.durationBa() + ") must equal 16"
-            );
         }
 
         Country country = mapToEntity(dto);
@@ -66,11 +55,7 @@ public class CountryService {
     private void updateCountryFromDto(Country country, CountryRegistrationDTO dto) {
         country.setName(dto.name());
         country.setYearsCompulsorySchooling(dto.yearsCompulsorySchooling());
-        country.setDurationBa(dto.durationBa());
-        country.setCreditsPerYear(dto.creditsPerYear());
         country.setGradingSystem(dto.gradingSystem());
-        country.setEqfLevel(dto.eqfLevel());
-        country.setOfficialDenomination(dto.officialDenomination());
     }
 
     public Country findCountryByIdAndUpdate(Long id, CountryRegistrationDTO dto) {

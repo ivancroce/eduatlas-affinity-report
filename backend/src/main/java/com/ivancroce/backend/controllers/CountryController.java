@@ -1,11 +1,12 @@
 package com.ivancroce.backend.controllers;
 
+import com.ivancroce.backend.entities.BachelorProgram;
 import com.ivancroce.backend.entities.Country;
 import com.ivancroce.backend.exceptions.ValidationException;
 import com.ivancroce.backend.payloads.CountryRegistrationDTO;
 import com.ivancroce.backend.payloads.CountryRespDTO;
+import com.ivancroce.backend.services.BachelorProgramService;
 import com.ivancroce.backend.services.CountryService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -23,12 +24,8 @@ public class CountryController {
     @Autowired
     private CountryService countryService;
 
-    @GetMapping
-    public Page<Country> getAllCountries(@RequestParam(defaultValue = "0") int page,
-                                        @RequestParam(defaultValue = "10") int size,
-                                        @RequestParam(defaultValue = "id") String sortBy) {
-        return countryService.findAllCountries(page, size, sortBy);
-    }
+    @Autowired
+    private BachelorProgramService bachelorProgramService;
 
     @GetMapping("/{id}")
     public Country getCountryById(@PathVariable Long id) {
@@ -38,6 +35,24 @@ public class CountryController {
     @GetMapping("/simple")
     public List<CountryRespDTO> getAllCountriesSimple() {
         return countryService.findAllCountriesSimple();
+    }
+
+    @GetMapping("/{countryId}/representative-program")
+    public BachelorProgram getRepresentativeProgram(@PathVariable Long countryId) {
+        return bachelorProgramService.getRepresentativeProgramForCountry(countryId);
+    }
+
+    @GetMapping("/{countryId}/programs")
+    public List<BachelorProgram> getProgramsByCountry(@PathVariable Long countryId) {
+        return bachelorProgramService.findByCountryId(countryId);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<Country> getAllCountries(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "10") int size,
+                                        @RequestParam(defaultValue = "id") String sortBy) {
+        return countryService.findAllCountries(page, size, sortBy);
     }
 
     @PostMapping

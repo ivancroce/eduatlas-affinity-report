@@ -1,6 +1,8 @@
 package com.ivancroce.backend.services;
 
+import com.ivancroce.backend.entities.BachelorProgram;
 import com.ivancroce.backend.entities.Country;
+import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.repositories.CountryRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -18,6 +20,9 @@ public class ExcelImportService {
     @Autowired
     private CountryRepository countryRepository;
 
+    @Autowired
+    private BachelorProgramRepository bachelorProgramRepository;
+
 
     public void importCountriesFromExcel() throws Exception {
         ClassPathResource resource = new ClassPathResource("data/matrix.xlsx");
@@ -30,7 +35,8 @@ public class ExcelImportService {
                 if(row != null) {
                     Country country = parseRowToCountry(row);
                     if (country != null) {
-                        countryRepository.save(country);
+                        Country savedCountry = countryRepository.save(country);
+                        createBachelorPrograms(savedCountry, row);
                         System.out.println("Saved: " + country.getName());
                 }
             }
@@ -50,15 +56,11 @@ public class ExcelImportService {
             }
             // Parse all fields from Excel
             Integer yearsSchooling = parseIntegerWithAsterisk(getCellValueAsString(row.getCell(1))); // "13*" -> 13
-            Integer duration = findDurationValue(row, yearsSchooling);
-            Integer creditsPerYear = parseCreditsPerYear(row);
             String gradingSystem = parseGradingSystem(row);
-            Integer eqfLevel = parseEqfLevel(row);
-            String officialDenomination = parseOfficialDenomination(row);
 
-            if (name != null && yearsSchooling != null && duration != null) {
-                return new Country(name, yearsSchooling, duration, creditsPerYear,
-                        gradingSystem, eqfLevel, officialDenomination);
+            if (name != null && yearsSchooling != null) {
+                return new Country(name, yearsSchooling,
+                        gradingSystem);
             }
         } catch (Exception e) {
             System.err.println("Error parsing row " + (row.getRowNum() + 1) + ": " + e.getMessage());
@@ -100,35 +102,6 @@ public class ExcelImportService {
             default:
                 return cell.toString().trim();
         }
-    }
-
-    private Integer findDurationValue(Row row, Integer yearsSchooling) {
-        if (yearsSchooling == null) return null;
-
-        // Calculate target duration for 16-year total
-        int targetDuration = 16 - yearsSchooling;
-
-        // Check columns C-G for target value (indices 2-6)
-        for (int col = 2; col <= 6; col++) {
-            Integer cellValue = parseIntegerWithAsterisk(getCellValueAsString(row.getCell(col)));
-            if (cellValue != null && cellValue == targetDuration) {
-                return cellValue;
-            }
-        }
-        // If no exact match found, but we know it should be targetDuration for 16-year rule
-        System.out.println("Warning: " + " expected duration " + targetDuration + " not found, using calculated value");
-        return targetDuration;  // Force the correct duration
-    }
-
-    private Integer parseCreditsPerYear(Row row) {
-        // Check columns H-L for credits (indices 7-11)
-        for (int col = 7; col <= 11; col++) {
-            Integer value = parseIntegerWithAsterisk(getCellValueAsString(row.getCell(col)));
-            if (value != null) {
-                return value;
-            }
-        }
-        return 60; // Default fallback
     }
 
     private Integer parseEqfLevel(Row row) {
@@ -174,18 +147,26 @@ public class ExcelImportService {
 
             if (!numbers.isEmpty()) {
                 Double result;
-                double firstNum = numbers.getFirst();
 
-                // German/Czech system: lower numbers are better
-                if (firstNum <= 6 && firstNum >= 1) {
-                    result = extractHigher ? numbers.getFirst() : numbers.getLast();
+                if (numbers.size() == 1) {
+                    result = numbers.getFirst();
+                } else {
+                    double firstNum = numbers.getFirst();
+
+                    // German grading system (higher-lower like 6-1)
+                    if (firstNum <= 6 && firstNum >= 1) {
+                                result = extractHigher ?
+                                numbers.stream().min(Double::compare).orElse(firstNum) :
+                                numbers.stream().max(Double::compare).orElse(firstNum);
+                    }
+                    // Italian grading system (lower-higher like 18-30)
+                    else {
+                        result = extractHigher ?
+                                numbers.stream().max(Double::compare).orElse(firstNum) :
+                                numbers.stream().min(Double::compare).orElse(firstNum);
+                    }
                 }
-                // Italian/Spanish system: higher numbers are better
-                else {
-                    result = extractHigher ? numbers.getLast() : numbers.getFirst();
-                }
-                // Check if number is whole (no decimals) to clean up display
-                return result % 1 == 0 ? String.valueOf(result.intValue()) : String.valueOf(result);
+                return String.valueOf(result.intValue());
             }
         }
 
@@ -206,6 +187,35 @@ public class ExcelImportService {
         }
 
         return "N/A";
+    }
+
+    private void createBachelorPrograms(Country country, Row row) {
+        for (int duration = 1; duration <= 5; duration++) {
+            int durationCol = duration + 1; // C=2, D=3, E=4, F=5, G=6
+            int creditsCol = duration + 6;  // H=7, I=8, J=9, K=10, L=11
+
+            String durationValue = getCellValueAsString(row.getCell(durationCol));
+
+            if (durationValue != null && !durationValue.trim().isEmpty()) {
+                boolean isSpecial = durationValue.contains("*");
+                Integer creditsPerYear = parseIntegerWithAsterisk(getCellValueAsString(row.getCell(creditsCol)));
+                String officialDenomination = parseOfficialDenomination(row);
+                Integer eqfLevel = parseEqfLevel(row);
+
+                if (creditsPerYear == null) creditsPerYear = 60; // Default fallback
+
+                BachelorProgram program = new BachelorProgram(
+                        duration,
+                        isSpecial,
+                        creditsPerYear,
+                        eqfLevel,
+                        officialDenomination,
+                        country
+                );
+                bachelorProgramRepository.save(program);
+                System.out.println("  - Created program: " + duration + " years, " + creditsPerYear + " credits");
+            }
+        }
     }
 }
 
