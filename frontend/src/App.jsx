@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage/NotFoundPage";
 import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard/StudentDashboard";
+import HomePage from "./pages/HomePage/HomePage";
 
 function App() {
   return (
@@ -15,7 +16,8 @@ function App() {
       <main className="flex-grow-1">
         <Container className="my-4">
           <Routes>
-            <Route path="/" element={<LoginPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/admin-dashboard" element={<AdminDashboard />} />
             <Route path="/student-dashboard" element={<StudentDashboard />} />
             <Route path="*" element={<NotFoundPage />} />

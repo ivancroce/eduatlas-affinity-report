@@ -3,6 +3,7 @@ import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { jwtDecode } from "jwt-decode";
+import { BsArrowLeft } from "react-icons/bs";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -59,6 +60,12 @@ const LoginPage = () => {
     <Container>
       <Row className="justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
         <Col md={6} lg={4}>
+          <div className="mb-3">
+            <Button variant="link" className="text-decoration-none p-0 d-flex align-items-center" onClick={() => navigate("/")}>
+              <BsArrowLeft className="me-2" size={20} />
+              Back to Home
+            </Button>
+          </div>
           <div className="p-4 login-card">
             <h3 className="text-center mb-4">Login</h3>
             {error && <Alert variant="danger">{error}</Alert>}
@@ -82,7 +89,7 @@ const LoginPage = () => {
               </Form.Group>
 
               <div className="d-grid">
-                <Button variant="primary" type="submit" disabled={isLoading}>
+                <Button variant="secondary" type="submit" disabled={isLoading}>
                   {isLoading ? "Logging in..." : "Login"}
                 </Button>
               </div>
