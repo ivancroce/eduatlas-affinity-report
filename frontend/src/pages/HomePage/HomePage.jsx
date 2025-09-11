@@ -1,12 +1,89 @@
-import { Container, Row, Col, Form, Button, Card } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Container, Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./HomePage.scss";
 
 const HomePage = () => {
+  const [countries, setCountries] = useState([]);
+  const [country1, setCountry1] = useState("");
+  const [country2, setCountry2] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchCountries();
+  }, []);
+
+  const fetchCountries = async () => {
+    try {
+      const response = await axios.get("http://localhost:3001/api/countries/simple");
+      setCountries(response.data);
+    } catch (error) {
+      console.error("Error fetching countries:", error);
+    }
+  };
+
+  const handleGenerateReport = async () => {
+    if (!country1 || !country2) {
+      setErrorMessage("Please select both countries");
+      return;
+    }
+
+    if (country1 === country2) {
+      setErrorMessage("Please select different countries");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const [country1Data, country2Data, program1Data, program2Data, special1Data, special2Data] = await Promise.all([
+        axios.get(`http://localhost:3001/api/countries/${country1}`),
+        axios.get(`http://localhost:3001/api/countries/${country2}`),
+        axios.get(`http://localhost:3001/api/countries/${country1}/representative-program`),
+        axios.get(`http://localhost:3001/api/countries/${country2}/representative-program`),
+        axios.get(`http://localhost:3001/api/countries/${country1}/has-special-program`),
+        axios.get(`http://localhost:3001/api/countries/${country2}/has-special-program`)
+      ]);
+
+      navigate("/affinity-report", {
+        state: {
+          country1: {
+            ...country1Data.data,
+            program: program1Data.data,
+            hasSpecialPrograms: special1Data.data
+          },
+          country2: {
+            ...country2Data.data,
+            program: program2Data.data,
+            hasSpecialPrograms: special2Data.data
+          }
+        }
+      });
+    } catch (error) {
+      console.error("Error generating report:", error);
+      setErrorMessage({ type: "danger", text: "Error generating report. Please try again." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
       {/* Hero Section */}
       <div className="py-5">
         <Container>
+          {errorMessage && (
+            <Row className="justify-content-center mb-4">
+              <Col lg={8}>
+                <Alert variant={errorMessage.type || "warning"} onClose={() => setErrorMessage("")} dismissible>
+                  {errorMessage.text || errorMessage}
+                </Alert>
+              </Col>
+            </Row>
+          )}
           <Row className="text-center mb-5">
             <Col>
               <h1 className="display-4 fw-normal text-primary mb-3 affinity-title">
@@ -29,8 +106,13 @@ const HomePage = () => {
                     <Col md={5}>
                       <Form.Group>
                         <Form.Label className="fw-bold text-primary">Country 1</Form.Label>
-                        <Form.Select size="lg" disabled>
-                          <option>Select Country</option>
+                        <Form.Select value={country1} onChange={(e) => setCountry1(e.target.value)} size="lg">
+                          <option value="">Select Country</option>
+                          {countries.map((country) => (
+                            <option key={country.id} value={country.id}>
+                              {country.name}
+                            </option>
+                          ))}
                         </Form.Select>
                         <Form.Text className="text-muted">First country for comparison</Form.Text>
                       </Form.Group>
@@ -45,8 +127,13 @@ const HomePage = () => {
                     <Col md={5}>
                       <Form.Group>
                         <Form.Label className="fw-bold text-primary">Country 2</Form.Label>
-                        <Form.Select size="lg" disabled>
-                          <option>Select Country</option>
+                        <Form.Select value={country2} onChange={(e) => setCountry2(e.target.value)} size="lg">
+                          <option value="">Select Country</option>
+                          {countries.map((country) => (
+                            <option key={country.id} value={country.id}>
+                              {country.name}
+                            </option>
+                          ))}
                         </Form.Select>
                         <Form.Text className="text-muted">Second country for comparison</Form.Text>
                       </Form.Group>
@@ -66,9 +153,44 @@ const HomePage = () => {
                   </Row>
 
                   <div className="text-center">
-                    <Button variant="secondary" size="lg" className="px-4 py-3" disabled>
-                      <i className="bi bi-graph-up me-2"></i>
-                      Generate Affinity Report
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="px-4 py-3 d-none d-sm-inline-block"
+                      onClick={handleGenerateReport}
+                      disabled={isLoading || !country1 || !country2}
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2"></span>
+                          Generating Report...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-graph-up me-2"></i>
+                          Generate Affinity Report
+                        </>
+                      )}
+                    </Button>
+
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      className="px-3 py-3 d-sm-none w-100"
+                      onClick={handleGenerateReport}
+                      disabled={isLoading || !country1 || !country2}
+                    >
+                      {isLoading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2"></span>
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <i className="bi bi-graph-up me-2"></i>
+                          Generate Report
+                        </>
+                      )}
                     </Button>
                   </div>
                 </Card.Body>
@@ -97,7 +219,7 @@ const HomePage = () => {
                 <i className="bi-clipboard-data display-4 fw-normal text-warning"></i>
               </div>
               <h4>Detailed Analysis</h4>
-              <p className="text-muted fs-5">Comprehensive degree comparison analysis</p>
+              <p className="text-muted fs-5">Comprehensive degree comparison analysis between countries</p>
             </Col>
           </Row>
         </Container>

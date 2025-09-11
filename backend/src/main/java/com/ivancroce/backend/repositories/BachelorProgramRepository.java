@@ -20,4 +20,6 @@ public interface BachelorProgramRepository extends JpaRepository<BachelorProgram
     Optional<BachelorProgram> findLongestProgramForCountry(@Param("countryId") Long countryId);
 
     boolean existsByCountryIdAndDuration(Long countryId, Integer duration);
+
+    boolean existsByCountryIdAndIsSpecialProgramTrue(Long countryId);
 }

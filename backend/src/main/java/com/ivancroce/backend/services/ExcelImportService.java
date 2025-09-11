@@ -82,6 +82,9 @@ public class ExcelImportService {
         String clean = value.replaceAll("\\*", "").trim();
 
         try {
+            if (clean.contains(".")) {
+                return (int) Math.ceil(Double.parseDouble(clean));
+            }
             return Integer.parseInt(clean);
         } catch (NumberFormatException e) {
             System.err.println("Could not parse: " + value);
@@ -204,6 +207,11 @@ public class ExcelImportService {
 
                 if (creditsPerYear == null) creditsPerYear = 60; // Default fallback
 
+                if ("Poland".equalsIgnoreCase(country.getName()) &&
+                        "3.5*".equals(durationValue) && duration == 4) {
+                    creditsPerYear = 60;
+                }
+
                 BachelorProgram program = new BachelorProgram(
                         duration,
                         isSpecial,
@@ -212,6 +220,12 @@ public class ExcelImportService {
                         officialDenomination,
                         country
                 );
+
+                if ("Poland".equalsIgnoreCase(country.getName()) &&
+                        "3.5*".equals(durationValue) && duration == 4) {
+                    program.setTotalCredits(210);
+                }
+
                 bachelorProgramRepository.save(program);
                 System.out.println("  - Created program: " + duration + " years, " + creditsPerYear + " credits");
             }

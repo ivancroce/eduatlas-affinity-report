@@ -5,6 +5,7 @@ import com.ivancroce.backend.entities.Country;
 import com.ivancroce.backend.exceptions.ValidationException;
 import com.ivancroce.backend.payloads.CountryRegistrationDTO;
 import com.ivancroce.backend.payloads.CountryRespDTO;
+import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.services.BachelorProgramService;
 import com.ivancroce.backend.services.CountryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -29,6 +31,9 @@ public class CountryController {
     @Autowired
     private BachelorProgramService bachelorProgramService;
 
+    @Autowired
+    private BachelorProgramRepository bachelorProgramRepository;
+
     @Operation(summary = "Get a country by ID", description = "Retrieves a single country's details based on its unique identifier.")
     @GetMapping("/{id}")
     public Country getCountryById(@PathVariable Long id) {
@@ -45,6 +50,12 @@ public class CountryController {
     @GetMapping("/{countryId}/representative-program")
     public BachelorProgram getRepresentativeProgram(@PathVariable Long countryId) {
         return bachelorProgramService.getRepresentativeProgramForCountry(countryId);
+    }
+
+    @GetMapping("/{countryId}/has-special-program")
+    public ResponseEntity<Boolean> hasSpecialPrograms(@PathVariable Long countryId) {
+        boolean hasSpecial = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(countryId);
+        return ResponseEntity.ok(hasSpecial);
     }
 
     @GetMapping("/{countryId}/programs")

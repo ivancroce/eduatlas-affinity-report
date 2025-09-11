@@ -63,6 +63,7 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
         if ("GET".equals(method)) {
             if (matcher.match("/api/countries/simple", path) ||
                     matcher.match("/api/countries/*/representative-program", path) ||
+                    matcher.match("/api/countries/*/has-special-program", path) ||
                     matcher.match("/api/countries/*", path)) {
                 return true;
             }
