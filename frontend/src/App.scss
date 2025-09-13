@@ -6,9 +6,6 @@ $success: #28a745;
 
 $background-blue-gray: #e8edf3;
 $background-gray: #f2f4f6;
-$card-gray: #f2f4f7;
-$moderate: #fd7e14;
-$accent: #fad749;
 
 body {
   font-family: "Lato", sans-serif;
@@ -19,10 +16,4 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-}
-
-.login-card {
-  background-color: $card-gray;
-  border-radius: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }

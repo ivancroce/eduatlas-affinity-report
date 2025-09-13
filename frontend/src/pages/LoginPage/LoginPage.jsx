@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Form, Button, Container, Row, Col, Card, Alert } from "react-bootstrap";
+import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { jwtDecode } from "jwt-decode";
 import { BsArrowLeft } from "react-icons/bs";
+import "./LoginPage.scss";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -38,6 +39,17 @@ const LoginPage = () => {
 
       const userRole = decoded.role;
 
+      window.dispatchEvent(
+        new CustomEvent("userLoggedIn", {
+          detail: {
+            role: userRole,
+            userId: decoded.sub
+          }
+        })
+      );
+
+      console.log("Custom event dispatched: userLoggedIn");
+
       if (userRole === "ADMIN") {
         navigate("/admin-dashboard");
       } else {
@@ -58,7 +70,7 @@ const LoginPage = () => {
 
   return (
     <Container>
-      <Row className="justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
+      <Row className="justify-content-center align-items-center" style={{ minHeight: "70vh" }}>
         <Col md={6} lg={4}>
           <div className="mb-3">
             <Button variant="link" className="text-decoration-none p-0 d-flex align-items-center" onClick={() => navigate("/")}>
