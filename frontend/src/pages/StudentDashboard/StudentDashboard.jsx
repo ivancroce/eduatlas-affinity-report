@@ -1,9 +1,13 @@
+import { Container } from "react-bootstrap";
+
 const StudentDashboard = () => {
   return (
-    <div>
-      <h1 className="mb-4">Affinity Report</h1>
-      <div>Coming soon...</div>
-    </div>
+    <Container>
+      <div className="mt-5">
+        <h1 className="mb-4">Student Dashboard</h1>
+        <div>Coming soon...</div>
+      </div>
+    </Container>
   );
 };
 
