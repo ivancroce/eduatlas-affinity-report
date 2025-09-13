@@ -38,7 +38,8 @@ public class CountryService {
         return new Country(
                 dto.name(),
                 dto.yearsCompulsorySchooling(),
-                dto.gradingSystem()
+                dto.gradingSystem(),
+                dto.creditRatio()
         );
     }
 

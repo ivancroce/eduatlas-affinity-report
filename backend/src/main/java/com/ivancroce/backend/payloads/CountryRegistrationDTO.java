@@ -12,6 +12,8 @@ public record CountryRegistrationDTO(
         Integer yearsCompulsorySchooling,
         @NotBlank(message = "Grading system is required")
         @Pattern(regexp = "^.+-.+$", message = "Grading system must follow format: worst-best (e.g., 18-30, F-A)")
-        String gradingSystem
+        String gradingSystem,
+        @NotBlank(message = "Credit ratio is required")
+        String creditRatio
 ) {
 }

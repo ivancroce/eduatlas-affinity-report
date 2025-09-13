@@ -57,10 +57,15 @@ public class ExcelImportService {
             // Parse all fields from Excel
             Integer yearsSchooling = parseIntegerWithAsterisk(getCellValueAsString(row.getCell(1))); // "13*" -> 13
             String gradingSystem = parseGradingSystem(row);
+            String creditRatio = getCellValueAsString(row.getCell(23));
 
             if (name != null && yearsSchooling != null) {
                 return new Country(name, yearsSchooling,
-                        gradingSystem);
+                        gradingSystem, creditRatio);
+            }
+
+            if (creditRatio == null || creditRatio.trim().isEmpty()) {
+                creditRatio = "25/30 HOURS OF STUDENT WORK";
             }
         } catch (Exception e) {
             System.err.println("Error parsing row " + (row.getRowNum() + 1) + ": " + e.getMessage());

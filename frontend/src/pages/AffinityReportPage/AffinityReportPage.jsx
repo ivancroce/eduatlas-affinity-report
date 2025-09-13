@@ -39,9 +39,9 @@ const AffinityReportPage = () => {
     return { level: "LOW", color: "danger" };
   };
 
-  // It always return EQUIVALENT at the moment because 'creditRatio' is not dynamic in the DB yet.
-  const calculateCreditRatioAffinity = () => {
-    return { level: "EQUIVALENT", color: "success" };
+  const calculateCreditRatioAffinity = (ratio1, ratio2) => {
+    if (ratio1 === ratio2) return { level: "EQUIVALENT", color: "success" };
+    return { level: "MODERATE", color: "warning" };
   };
 
   // It always return CAN ALWAYS BE CONVERTED at the moment
@@ -76,7 +76,7 @@ const AffinityReportPage = () => {
 
   const durationAffinity = calculateDurationAffinity(country1.program.duration, country2.program.duration);
   const creditsAffinity = calculateCreditsAffinity(country1.program.totalCredits, country2.program.totalCredits);
-  const creditRatioAffinity = calculateCreditRatioAffinity("25/30 HOURS OF STUDENT WORK", "25/30 HOURS OF STUDENT WORK");
+  const creditRatioAffinity = calculateCreditRatioAffinity(country1.creditRatio, country2.creditRatio);
   const gradingAffinity = calculateGradingAffinity(country1.gradingSystem, country2.gradingSystem);
   const eqfAffinity = calculateEqfAffinity(country1.program.eqfLevel, country2.program.eqfLevel);
 
@@ -106,8 +106,8 @@ const AffinityReportPage = () => {
     },
     {
       category: "CREDIT RATIO (1 ECTS)",
-      country1Value: "25/30 HOURS OF STUDENT WORK",
-      country2Value: "25/30 HOURS OF STUDENT WORK",
+      country1Value: `${country1.creditRatio} HOURS OF STUDENT WORK`,
+      country2Value: `${country2.creditRatio} HOURS OF STUDENT WORK`,
       affinity: creditRatioAffinity
     },
     {
@@ -260,8 +260,9 @@ const AffinityReportPage = () => {
                     {country2.yearsCompulsorySchooling}+{country2.program.duration} {country2.name}), making them broadly equivalent.
                   </p>
                   <p className="mb-0 text-muted small report-text">
-                    Credit ratio (1 ECTS = 25-30 hours) is identical. Grading systems differ but are convertible. Academic level, workload, and recognition are
-                    fully equivalent. Recognition is subject to dual institutional discretion.
+                    Credit ratio (1 ECTS = {country1.creditRatio} hours) is {country1.creditRatio === country2.creditRatio ? "identical" : "different"}. Grading
+                    systems differ but are convertible. Academic level, workload, and recognition are fully equivalent. Recognition is subject to dual
+                    institutional discretion.
                   </p>
                   {(country1.hasSpecialPrograms || country2.hasSpecialPrograms) && (
                     <div className="mt-3 p-3 bg-info bg-opacity-10 border border-info rounded">
