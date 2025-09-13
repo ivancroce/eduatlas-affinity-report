@@ -57,6 +57,7 @@ public class CountryService {
         country.setName(dto.name());
         country.setYearsCompulsorySchooling(dto.yearsCompulsorySchooling());
         country.setGradingSystem(dto.gradingSystem());
+        country.setCreditRatio(dto.creditRatio());
     }
 
     public Country findCountryByIdAndUpdate(Long id, CountryRegistrationDTO dto) {

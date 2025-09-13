@@ -14,6 +14,8 @@ public record CountryRegistrationDTO(
         @Pattern(regexp = "^.+-.+$", message = "Grading system must follow format: worst-best (e.g., 18-30, F-A)")
         String gradingSystem,
         @NotBlank(message = "Credit ratio is required")
+        @Pattern(regexp = "^\\d+(/\\d+)?$",
+                message = "Credit ratio must be a number or number/number format (e.g., 30 or 25/30)")
         String creditRatio
 ) {
 }

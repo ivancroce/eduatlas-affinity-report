@@ -1,0 +1,388 @@
+import { useState, useEffect } from "react";
+import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Card, Pagination } from "react-bootstrap";
+import { BsPencilSquare, BsTrash, BsPlus, BsEye } from "react-icons/bs";
+import api from "../../api/axios";
+
+const CountriesManagement = () => {
+  const [countries, setCountries] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [showProgramsModal, setShowProgramsModal] = useState(false);
+  const [modalMode, setModalMode] = useState("view"); // view, edit, create
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [bachelorPrograms, setBachelorPrograms] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [pageSize] = useState(10);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    yearsCompulsorySchooling: "",
+    gradingSystem: "",
+    creditRatio: ""
+  });
+
+  useEffect(() => {
+    fetchCountries();
+  }, []);
+
+  const fetchCountries = async (page = 0) => {
+    try {
+      setIsLoading(true);
+
+      const response = await api.get(`/countries?page=${page}&size=${pageSize}&sort=name`);
+      console.log("Response data:", response.data);
+
+      const pageData = response.data;
+
+      setCountries(pageData.content || []);
+      setTotalPages(pageData.totalPages || 0);
+      setTotalElements(pageData.totalElements || 0);
+      setCurrentPage(pageData.number || 0);
+    } catch (error) {
+      console.error("Full error object:", error);
+      setError("Failed to fetch countries: " + (error.response?.data?.message || error.message));
+      setCountries([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCountryPrograms = async (countryId) => {
+    try {
+      const response = await api.get(`/countries/${countryId}/bachelor-programs`);
+      setBachelorPrograms(response.data);
+    } catch (error) {
+      setError("Failed to fetch bachelor programs");
+      console.error("Error fetching programs:", error);
+    }
+  };
+
+  const handleShowModal = (mode, country = null) => {
+    setModalMode(mode);
+    setSelectedCountry(country);
+
+    if (country) {
+      setFormData({
+        name: country.name || "",
+        yearsCompulsorySchooling: country.yearsCompulsorySchooling || "",
+        gradingSystem: country.gradingSystem || "",
+        creditRatio: country.creditRatio || ""
+      });
+    } else {
+      setFormData({
+        name: "",
+        yearsCompulsorySchooling: "",
+        gradingSystem: "",
+        creditRatio: ""
+      });
+    }
+
+    setShowModal(true);
+    setError("");
+    setSuccess("");
+  };
+
+  const handleShowPrograms = async (country) => {
+    setSelectedCountry(country);
+    await fetchCountryPrograms(country.id);
+    setShowProgramsModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setShowProgramsModal(false);
+    setSelectedCountry(null);
+    setFormData({
+      name: "",
+      yearsCompulsorySchooling: "",
+      gradingSystem: "",
+      creditRatio: ""
+    });
+    setError("");
+    setSuccess("");
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      if (modalMode === "create") {
+        await api.post("/countries", formData);
+        setSuccess("Country created successfully!");
+      } else if (modalMode === "edit") {
+        await api.put(`/countries/${selectedCountry.id}`, formData);
+        setSuccess("Country updated successfully!");
+      }
+
+      setTimeout(() => {
+        handleCloseModal();
+        fetchCountries();
+      }, 1500);
+    } catch (error) {
+      console.log("Full error:", error);
+      console.log("Error response:", error.response?.data);
+
+      if (error.response?.data?.errorsList && Array.isArray(error.response.data.errorsList)) {
+        setError("Validation errors: " + error.response.data.errorsList.join(", "));
+      } else {
+        setError(error.response?.data?.message || "Operation failed");
+      }
+
+      console.error("Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (countryId) => {
+    if (window.confirm("Are you sure you want to delete this country?")) {
+      try {
+        setIsLoading(true);
+        await api.delete(`/countries/${countryId}`);
+        setSuccess("Country deleted successfully!");
+        fetchCountries();
+        setTimeout(() => setSuccess(""), 3000);
+      } catch (error) {
+        if (error.response?.data?.errorsList && Array.isArray(error.response.data.errorsList)) {
+          setError("Delete failed: " + error.response.data.errorsList.join(", "));
+        } else {
+          setError(error.response?.data?.message || "Delete failed");
+        }
+        setTimeout(() => setError(""), 3000);
+        console.error("Error deleting country:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  return (
+    <div>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>}
+
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h3>Countries Management</h3>
+        <Button variant="secondary" onClick={() => handleShowModal("create")}>
+          <BsPlus className="me-2" />
+          Add Country
+        </Button>
+      </div>
+
+      {isLoading && !showModal ? (
+        <div className="text-center py-4">Loading...</div>
+      ) : (
+        <Table striped bordered hover responsive className="text-center">
+          <thead className="table-secondary">
+            <tr>
+              <th>ID</th>
+              <th>Country Name</th>
+              <th>Years Schooling</th>
+              <th>Grading System</th>
+              <th>Credit Ratio</th>
+              <th style={{ width: "20%" }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {countries && countries.length > 0 ? (
+              countries.map((country) => (
+                <tr key={country.id}>
+                  <td>{country.id}</td>
+                  <td>{country.name}</td>
+                  <td>{country.yearsCompulsorySchooling}</td>
+                  <td>{country.gradingSystem}</td>
+                  <td>{country.creditRatio}</td>
+                  <td style={{ width: "20%" }} className="text-nowrap">
+                    <div className="d-flex gap-2 justify-content-center">
+                      <Button variant="info" size="sm" onClick={() => handleShowPrograms(country)}>
+                        <BsEye />
+                      </Button>
+                      <Button variant="warning" size="sm" onClick={() => handleShowModal("edit", country)}>
+                        <BsPencilSquare />
+                      </Button>
+                      <Button variant="danger" size="sm" onClick={() => handleDelete(country.id)}>
+                        <BsTrash />
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="text-center">
+                  {isLoading ? "Loading..." : "No countries found"}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </Table>
+      )}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-4">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+            <div className="text-muted order-2 order-md-1 text-center text-md-start">
+              Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} countries
+            </div>
+
+            <Pagination className="order-1 order-md-2">
+              <Pagination.First onClick={() => fetchCountries(0)} disabled={currentPage === 0} />
+              <Pagination.Prev onClick={() => fetchCountries(currentPage - 1)} disabled={currentPage === 0} />
+
+              {[...Array(totalPages)].map((_, index) => (
+                <Pagination.Item key={index} active={index === currentPage} onClick={() => fetchCountries(index)}>
+                  {index + 1}
+                </Pagination.Item>
+              ))}
+
+              <Pagination.Next onClick={() => fetchCountries(currentPage + 1)} disabled={currentPage === totalPages - 1} />
+              <Pagination.Last onClick={() => fetchCountries(totalPages - 1)} disabled={currentPage === totalPages - 1} />
+            </Pagination>
+          </div>
+        </div>
+      )}
+
+      {/* Country Form Modal */}
+      <Modal show={showModal} onHide={handleCloseModal} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>{modalMode === "create" ? "Add New Country" : modalMode === "edit" ? "Edit Country" : "View Country"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {error && <Alert variant="danger">{error}</Alert>}
+          {success && <Alert variant="success">{success}</Alert>}
+
+          <Form onSubmit={handleSubmit}>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Country Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    disabled={modalMode === "view" || isLoading}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Years of Compulsory Schooling</Form.Label>
+                  <Form.Select
+                    name="yearsCompulsorySchooling"
+                    value={formData.yearsCompulsorySchooling}
+                    onChange={handleInputChange}
+                    disabled={modalMode === "view" || isLoading}
+                    required
+                  >
+                    <option value="">Select Years</option>
+                    <option value="12">12 years</option>
+                    <option value="13">13 years</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Grading System</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="gradingSystem"
+                    value={formData.gradingSystem}
+                    onChange={handleInputChange}
+                    disabled={modalMode === "view" || isLoading}
+                    placeholder="e.g., 18-30 or F-A"
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Credit Ratio</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="creditRatio"
+                    value={formData.creditRatio}
+                    onChange={handleInputChange}
+                    disabled={modalMode === "view" || isLoading}
+                    placeholder="e.g., 25/30"
+                    required
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseModal}>
+            Close
+          </Button>
+          {modalMode !== "view" && (
+            <Button variant="secondary" onClick={handleSubmit} disabled={isLoading}>
+              {isLoading ? "Saving..." : modalMode === "create" ? "Create" : "Update"}
+            </Button>
+          )}
+        </Modal.Footer>
+      </Modal>
+
+      {/* Bachelor Programs Modal */}
+      <Modal show={showProgramsModal} onHide={handleCloseModal} size="xl">
+        <Modal.Header closeButton>
+          <Modal.Title>Bachelor Programs - {selectedCountry?.name}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Duration (Years)</th>
+                <th>Credits Per Year</th>
+                <th>Total Credits</th>
+                <th>EQF Level</th>
+                <th>Special Program</th>
+                <th>Official Denomination</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bachelorPrograms.map((program) => (
+                <tr key={program.id}>
+                  <td>{program.duration}</td>
+                  <td>{program.creditsPerYear}</td>
+                  <td>{program.totalCredits}</td>
+                  <td>{program.eqfLevel}</td>
+                  <td>{program.isSpecialProgram ? <Badge bg="warning">Special</Badge> : <Badge bg="secondary">Standard</Badge>}</td>
+                  <td>{program.officialDenomination}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="primary" onClick={handleCloseModal}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </div>
+  );
+};
+
+export default CountriesManagement;

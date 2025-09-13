@@ -58,9 +58,9 @@ public class CountryController {
         return ResponseEntity.ok(hasSpecial);
     }
 
-    @GetMapping("/{countryId}/programs")
+    @GetMapping("/{countryId}/bachelor-programs")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<BachelorProgram> getProgramsByCountry(@PathVariable Long countryId) {
+    public List<BachelorProgram> getCountryBachelorPrograms(@PathVariable Long countryId) {
         return bachelorProgramService.findByCountryId(countryId);
     }
 
