@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Card, Pagination } from "react-bootstrap";
-import { BsPencilSquare, BsTrash, BsPlus, BsEye } from "react-icons/bs";
+import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
 
 const CountriesManagement = () => {
@@ -17,6 +17,8 @@ const CountriesManagement = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [pageSize] = useState(10);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [countryToDelete, setCountryToDelete] = useState(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -26,7 +28,25 @@ const CountriesManagement = () => {
   });
 
   useEffect(() => {
-    fetchCountries();
+    const loadInitialData = async () => {
+      try {
+        setIsLoading(true);
+        const response = await api.get(`/countries?page=0&size=10&sort=name`);
+        const pageData = response.data;
+
+        setCountries(pageData.content || []);
+        setTotalPages(pageData.totalPages || 0);
+        setTotalElements(pageData.totalElements || 0);
+        setCurrentPage(pageData.number || 0);
+      } catch (error) {
+        setError("Failed to fetch countries: " + (error.response?.data?.message || error.message));
+        setCountries([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadInitialData();
   }, []);
 
   const fetchCountries = async (page = 0) => {
@@ -149,26 +169,42 @@ const CountriesManagement = () => {
     }
   };
 
-  const handleDelete = async (countryId) => {
-    if (window.confirm("Are you sure you want to delete this country?")) {
-      try {
-        setIsLoading(true);
-        await api.delete(`/countries/${countryId}`);
-        setSuccess("Country deleted successfully!");
-        fetchCountries();
-        setTimeout(() => setSuccess(""), 3000);
-      } catch (error) {
-        if (error.response?.data?.errorsList && Array.isArray(error.response.data.errorsList)) {
-          setError("Delete failed: " + error.response.data.errorsList.join(", "));
-        } else {
-          setError(error.response?.data?.message || "Delete failed");
-        }
-        setTimeout(() => setError(""), 3000);
-        console.error("Error deleting country:", error);
-      } finally {
-        setIsLoading(false);
+  const handleDelete = async () => {
+    if (!countryToDelete) return;
+
+    try {
+      setIsLoading(true);
+      await api.delete(`/countries/${countryToDelete.id}`);
+      setSuccess("Country deleted successfully!");
+      fetchCountries();
+      setTimeout(() => setSuccess(""), 3000);
+
+      setShowDeleteModal(false);
+      setCountryToDelete(null);
+    } catch (error) {
+      if (error.response?.data?.errorsList && Array.isArray(error.response.data.errorsList)) {
+        setError("Delete failed: " + error.response.data.errorsList.join(", "));
+      } else {
+        setError(error.response?.data?.message || "Delete failed");
       }
+      setTimeout(() => setError(""), 3000);
+      console.error("Error deleting country:", error);
+
+      setShowDeleteModal(false);
+      setCountryToDelete(null);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const handleDeleteClick = (country) => {
+    setCountryToDelete(country);
+    setShowDeleteModal(true);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setCountryToDelete(null);
   };
 
   return (
@@ -215,7 +251,7 @@ const CountriesManagement = () => {
                       <Button variant="warning" size="sm" onClick={() => handleShowModal("edit", country)}>
                         <BsPencilSquare />
                       </Button>
-                      <Button variant="danger" size="sm" onClick={() => handleDelete(country.id)}>
+                      <Button variant="danger" size="sm" onClick={() => handleDeleteClick(country)}>
                         <BsTrash />
                       </Button>
                     </div>
@@ -378,6 +414,36 @@ const CountriesManagement = () => {
         <Modal.Footer>
           <Button variant="primary" onClick={handleCloseModal}>
             Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={cancelDelete} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <BsExclamationTriangle className="text-danger me-2" />
+            Confirm Delete
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            Are you sure you want to delete the country <strong>"{countryToDelete?.name}"</strong>?
+          </p>
+          <div className="text-muted mt-2">
+            <small>
+              <BsExclamationTriangle className="me-1" />
+              This action cannot be undone. All associated data will be permanently removed.
+            </small>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={cancelDelete} disabled={isLoading}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={handleDelete} disabled={isLoading}>
+            <BsTrash className="me-2" />
+            {isLoading ? "Deleting..." : "Yes, Delete"}
           </Button>
         </Modal.Footer>
       </Modal>
