@@ -1,8 +1,14 @@
+@use "sass:color";
+
 $primary: #00275a;
 $secondary: #146ca8;
 $success: #28a745;
 
-@import "../node_modules/bootstrap/scss/bootstrap";
+@use "../node_modules/bootstrap/scss/bootstrap" with (
+  $primary: $primary,
+  $secondary: $secondary,
+  $success: $success
+);
 
 $background-blue-gray: #e8edf3;
 $background-gray: #f2f4f6;
@@ -16,4 +22,16 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+}
+
+.w-20 {
+  width: 20% !important;
+}
+
+.w-30 {
+  width: 30% !important;
+}
+
+.min-h-70vh {
+  min-height: 70vh;
 }

@@ -70,7 +70,7 @@ const LoginPage = () => {
 
   return (
     <Container>
-      <Row className="justify-content-center align-items-center" style={{ minHeight: "70vh" }}>
+      <Row className="justify-content-center align-items-center min-h-70vh">
         <Col md={6} lg={4}>
           <div className="mb-3">
             <Button variant="link" className="text-decoration-none p-0 d-flex align-items-center" onClick={() => navigate("/")}>

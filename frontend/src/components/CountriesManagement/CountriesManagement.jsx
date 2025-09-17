@@ -155,7 +155,6 @@ const CountriesManagement = () => {
       }, 1500);
     } catch (error) {
       console.log("Full error:", error);
-      console.log("Error response:", error.response?.data);
 
       if (error.response?.data?.errorsList && Array.isArray(error.response.data.errorsList)) {
         setError("Validation errors: " + error.response.data.errorsList.join(", "));
@@ -231,7 +230,7 @@ const CountriesManagement = () => {
               <th>Years Schooling</th>
               <th>Grading System</th>
               <th>Credit Ratio</th>
-              <th style={{ width: "20%" }}>Actions</th>
+              <th className="w-20">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -243,7 +242,7 @@ const CountriesManagement = () => {
                   <td>{country.yearsCompulsorySchooling}</td>
                   <td>{country.gradingSystem}</td>
                   <td>{country.creditRatio}</td>
-                  <td style={{ width: "20%" }} className="text-nowrap">
+                  <td className="text-nowrap w-20">
                     <div className="d-flex gap-2 justify-content-center">
                       <Button variant="info" size="sm" onClick={() => handleShowPrograms(country)}>
                         <BsEye />

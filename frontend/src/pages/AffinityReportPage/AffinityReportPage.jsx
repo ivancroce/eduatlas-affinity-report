@@ -211,16 +211,10 @@ const AffinityReportPage = () => {
             <Table className="mb-0" bordered>
               <thead className="table-secondary">
                 <tr>
-                  <th style={{ width: "20%" }}></th>
-                  <th className="text-center" style={{ width: "25%" }}>
-                    {country1.name.toUpperCase()}
-                  </th>
-                  <th className="text-center" style={{ width: "25%" }}>
-                    {country2.name.toUpperCase()}
-                  </th>
-                  <th className="text-center" style={{ width: "30%" }}>
-                    AFFINITY
-                  </th>
+                  <th className="w-20"></th>
+                  <th className="text-center w-25">{country1.name.toUpperCase()}</th>
+                  <th className="text-center w-25">{country2.name.toUpperCase()}</th>
+                  <th className="text-center w-30">AFFINITY</th>
                 </tr>
               </thead>
               <tbody>
@@ -311,7 +305,7 @@ const AffinityReportPage = () => {
           </p>
         </Col>
         <Col md={3} className="text-center">
-          <Image src={eduatlasLogo} alt="EduAtlas Logo" className="img-fluid" style={{ maxWidth: "120px" }} />
+          <Image src={eduatlasLogo} alt="EduAtlas Logo" className="img-fluid logo-sm" />
         </Col>
       </Row>
     </Container>
