@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Card, Pagination } from "react-bootstrap";
 import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
+import "./CountriesManagement.scss";
 
 const CountriesManagement = () => {
   const [countries, setCountries] = useState([]);
@@ -16,7 +17,7 @@ const CountriesManagement = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(10);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [countryToDelete, setCountryToDelete] = useState(null);
 
@@ -28,26 +29,9 @@ const CountriesManagement = () => {
   });
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      try {
-        setIsLoading(true);
-        const response = await api.get(`/countries?page=0&size=10&sort=name`);
-        const pageData = response.data;
-
-        setCountries(pageData.content || []);
-        setTotalPages(pageData.totalPages || 0);
-        setTotalElements(pageData.totalElements || 0);
-        setCurrentPage(pageData.number || 0);
-      } catch (error) {
-        setError("Failed to fetch countries: " + (error.response?.data?.message || error.message));
-        setCountries([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadInitialData();
-  }, []);
+    fetchCountries(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pageSize]);
 
   const fetchCountries = async (page = 0) => {
     try {
@@ -268,30 +252,62 @@ const CountriesManagement = () => {
         </Table>
       )}
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-4">
-          <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
-            <div className="text-muted order-2 order-md-1 text-center text-md-start">
-              Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} countries
+      {/* Page Size */}
+      <div className="mt-4">
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+          <div className="text-muted order-2 order-md-1 text-center text-md-start">
+            Showing {currentPage * pageSize + 1} to {Math.min((currentPage + 1) * pageSize, totalElements)} of {totalElements} countries
+          </div>
+
+          <div className="order-1 order-md-2 d-flex flex-column flex-md-row align-items-center gap-3">
+            {/* Page Size Selector */}
+            <div className="d-flex align-items-center gap-2">
+              <span className="text-muted small">Show:</span>
+              <Form.Select
+                size="sm"
+                value={pageSize}
+                onChange={(e) => {
+                  const newSize = parseInt(e.target.value);
+                  setPageSize(newSize);
+                  setCurrentPage(0);
+                }}
+                className="page-select"
+              >
+                <option value="5">5</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+              </Form.Select>
+              <span className="text-muted small">per page</span>
             </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination className="mb-0 flex-wrap justify-content-center" size="sm">
+                <Pagination.First onClick={() => fetchCountries(0)} disabled={currentPage === 0} />
+                <Pagination.Prev onClick={() => fetchCountries(currentPage - 1)} disabled={currentPage === 0} />
 
-            <Pagination className="order-1 order-md-2">
-              <Pagination.First onClick={() => fetchCountries(0)} disabled={currentPage === 0} />
-              <Pagination.Prev onClick={() => fetchCountries(currentPage - 1)} disabled={currentPage === 0} />
+                {(() => {
+                  const maxVisible = 5;
+                  const start = Math.max(0, Math.min(currentPage - 2, totalPages - maxVisible));
+                  const end = Math.min(start + maxVisible, totalPages);
 
-              {[...Array(totalPages)].map((_, index) => (
-                <Pagination.Item key={index} active={index === currentPage} onClick={() => fetchCountries(index)}>
-                  {index + 1}
-                </Pagination.Item>
-              ))}
+                  return [...Array(end - start)].map((_, index) => {
+                    const pageIndex = start + index;
+                    return (
+                      <Pagination.Item key={pageIndex} active={pageIndex === currentPage} onClick={() => fetchCountries(pageIndex)}>
+                        {pageIndex + 1}
+                      </Pagination.Item>
+                    );
+                  });
+                })()}
 
-              <Pagination.Next onClick={() => fetchCountries(currentPage + 1)} disabled={currentPage === totalPages - 1} />
-              <Pagination.Last onClick={() => fetchCountries(totalPages - 1)} disabled={currentPage === totalPages - 1} />
-            </Pagination>
+                <Pagination.Next onClick={() => fetchCountries(currentPage + 1)} disabled={currentPage === totalPages - 1} />
+                <Pagination.Last onClick={() => fetchCountries(totalPages - 1)} disabled={currentPage === totalPages - 1} />
+              </Pagination>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Country Form Modal */}
       <Modal show={showModal} onHide={handleCloseModal} size="lg">
