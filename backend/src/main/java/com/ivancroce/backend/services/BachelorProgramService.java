@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -109,5 +110,28 @@ public BachelorProgram findById(Long id) {
     public void deleteProgram(Long id) {
         BachelorProgram program = findById(id);
         bachelorProgramRepository.delete(program);
+    }
+
+    public Page<BachelorProgram> searchBachelorPrograms(Long countryId, Integer duration, Boolean isSpecialProgram,
+                                                        int page, int size, String sortBy, String direction) {
+
+        Specification<BachelorProgram> countrySpec = (root, query, builder) ->
+                countryId == null ? null : builder.equal(root.get("country").get("id"), countryId);
+
+        Specification<BachelorProgram> durationSpec = (root, query, builder) ->
+                duration == null ? null : builder.equal(root.get("duration"), duration);
+
+        Specification<BachelorProgram> specialProgramSpec = (root, query, builder) ->
+                isSpecialProgram == null ? null : builder.equal(root.get("isSpecialProgram"), isSpecialProgram);
+
+        Specification<BachelorProgram> specification = Specification.<BachelorProgram>unrestricted()
+                .and(countrySpec)
+                .and(durationSpec)
+                .and(specialProgramSpec);
+
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return bachelorProgramRepository.findAll(specification, pageable);
     }
 }

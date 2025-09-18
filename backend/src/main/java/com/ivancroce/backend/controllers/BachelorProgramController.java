@@ -68,5 +68,17 @@ public class BachelorProgramController {
         bachelorProgramService.deleteProgram(id);
     }
 
-
+    @GetMapping("/search")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<BachelorProgram> searchBachelorPrograms(
+            @RequestParam(required = false) Long countryId,
+            @RequestParam(required = false) Integer duration,
+            @RequestParam(required = false) Boolean isSpecialProgram,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        return bachelorProgramService.searchBachelorPrograms(countryId, duration, isSpecialProgram, page, size, sortBy, direction);
+    }
 }

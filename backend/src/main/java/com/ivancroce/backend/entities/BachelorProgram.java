@@ -1,6 +1,7 @@
 package com.ivancroce.backend.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,6 +32,9 @@ public class BachelorProgram {
     @JoinColumn(name = "country_id", nullable = false)
     @JsonIgnore
     private Country country;
+    @Column(name = "country_id", insertable = false, updatable = false)
+    @JsonProperty("countryId")
+    private Long countryId;
 
     public BachelorProgram(Integer duration, Boolean isSpecialProgram, Integer creditsPerYear, Integer eqfLevel,
                            String officialDenomination, Country country) {
