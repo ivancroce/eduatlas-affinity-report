@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Card, Pagination } from "react-bootstrap";
+import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Pagination } from "react-bootstrap";
 import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
 import "./CountriesManagement.scss";
