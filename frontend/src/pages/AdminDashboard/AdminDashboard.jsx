@@ -3,6 +3,7 @@ import { Tabs, Tab, Container, Row, Col, Card } from "react-bootstrap";
 import { BsGear, BsGlobe, BsPeople } from "react-icons/bs";
 import UsersManagement from "../../components/UsersManagement/UsersManagement";
 import CountriesManagement from "../../components/CountriesManagement/CountriesManagement";
+import BachelorProgramsManagement from "../../components/BachelorProgramsManagement/BachelorProgramsManagement";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("countries");
@@ -33,6 +34,20 @@ const AdminDashboard = () => {
                 >
                   <div className="mt-3">
                     <CountriesManagement />
+                  </div>
+                </Tab>
+
+                <Tab
+                  eventKey="programs"
+                  title={
+                    <span>
+                      <BsPeople className="me-2" />
+                      BA Programs Management
+                    </span>
+                  }
+                >
+                  <div className="mt-3">
+                    <BachelorProgramsManagement />
                   </div>
                 </Tab>
 
