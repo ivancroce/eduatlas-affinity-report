@@ -231,9 +231,10 @@ const BachelorProgramsManagement = () => {
     return country?.name || "Unknown Country";
   };
 
-  // TODO: need to fix formatDuration
   const formatDuration = (program) => {
-    if (program.country?.name === "Poland" && program.duration === 4 && program.isSpecialProgram) {
+    const countryName = getCountryName(program);
+
+    if (countryName === "Poland" && program.duration === 4 && program.isSpecialProgram) {
       return "3.5";
     }
     return program.duration?.toString() || "";
