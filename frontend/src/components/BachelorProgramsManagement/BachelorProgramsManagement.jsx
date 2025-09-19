@@ -223,10 +223,6 @@ const BachelorProgramsManagement = () => {
   };
 
   const getCountryName = (program) => {
-    if (program.country?.name) {
-      return program.country.name;
-    }
-    // Fallback
     const country = countries.find((c) => c.id === program.countryId);
     return country?.name || "Unknown Country";
   };
