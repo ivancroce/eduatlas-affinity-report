@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Pagination } from "react-bootstrap";
 import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
@@ -7,6 +7,8 @@ import "./CountriesManagement.scss";
 const CountriesManagement = () => {
   const [countries, setCountries] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [allCountriesForDropdown, setAllCountriesForDropdown] = useState([]);
+
   const [showModal, setShowModal] = useState(false);
   const [showProgramsModal, setShowProgramsModal] = useState(false);
   const [modalMode, setModalMode] = useState("view"); // view, edit, create
@@ -14,12 +16,19 @@ const CountriesManagement = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [bachelorPrograms, setBachelorPrograms] = useState([]);
+
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [pageSize, setPageSize] = useState(10);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [countryToDelete, setCountryToDelete] = useState(null);
+
+  const [filters, setFilters] = useState({
+    countryId: "",
+    yearsCompulsorySchooling: ""
+  });
 
   const [formData, setFormData] = useState({
     name: "",
@@ -28,32 +37,38 @@ const CountriesManagement = () => {
     creditRatio: ""
   });
 
-  useEffect(() => {
-    fetchCountries(0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageSize]);
+  const fetchCountries = useCallback(
+    async (page = 0) => {
+      try {
+        setIsLoading(true);
+        const hasFilters = filters.countryId || filters.yearsCompulsorySchooling;
 
-  const fetchCountries = async (page = 0) => {
-    try {
-      setIsLoading(true);
+        let url;
+        if (hasFilters) {
+          url = `/countries/search?page=${page}&size=${pageSize}&sortBy=name&direction=asc`;
+          if (filters.countryId) url += `&id=${filters.countryId}`;
+          if (filters.yearsCompulsorySchooling) url += `&yearsCompulsorySchooling=${filters.yearsCompulsorySchooling}`;
+        } else {
+          url = `/countries?page=${page}&size=${pageSize}&sortBy=name&direction=asc`;
+        }
 
-      const response = await api.get(`/countries?page=${page}&size=${pageSize}&sort=name`);
-      console.log("Response data:", response.data);
+        const response = await api.get(url);
+        const pageData = response.data;
 
-      const pageData = response.data;
-
-      setCountries(pageData.content || []);
-      setTotalPages(pageData.totalPages || 0);
-      setTotalElements(pageData.totalElements || 0);
-      setCurrentPage(pageData.number || 0);
-    } catch (error) {
-      console.error("Full error object:", error);
-      setError("Failed to fetch countries: " + (error.response?.data?.message || error.message));
-      setCountries([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        setCountries(pageData.content || []);
+        setTotalPages(pageData.totalPages || 0);
+        setTotalElements(pageData.totalElements || 0);
+        setCurrentPage(pageData.number || 0);
+      } catch (error) {
+        console.error("Full error object", error);
+        setError("Failed to fetch countries: " + (error.response?.data?.message || error.message));
+        setCountries([]);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [pageSize, filters]
+  );
 
   const fetchCountryPrograms = async (countryId) => {
     try {
@@ -64,6 +79,23 @@ const CountriesManagement = () => {
       console.error("Error fetching programs:", error);
     }
   };
+
+  const fetchAllCountriesForDropdown = async () => {
+    try {
+      const response = await api.get("/countries?page=0&size=100&sortBy=name");
+      setAllCountriesForDropdown(response.data.content || []);
+    } catch (error) {
+      console.error("Error fetching countries for dropdown:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllCountriesForDropdown();
+  }, []);
+
+  useEffect(() => {
+    fetchCountries(0);
+  }, [fetchCountries]);
 
   const handleShowModal = (mode, country = null) => {
     setModalMode(mode);
@@ -190,6 +222,14 @@ const CountriesManagement = () => {
     setCountryToDelete(null);
   };
 
+  const handleFilterChange = (filterName, value) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterName]: value
+    }));
+    setCurrentPage(0);
+  };
+
   return (
     <div>
       {error && <Alert variant="danger">{error}</Alert>}
@@ -202,7 +242,39 @@ const CountriesManagement = () => {
           Add Country
         </Button>
       </div>
-
+      <div className="mb-3">
+        <Row className="g-3">
+          <Col md={3}>
+            <Form.Select value={filters.countryId} onChange={(e) => handleFilterChange("countryId", e.target.value)} size="sm">
+              <option value="">All Countries</option>
+              {allCountriesForDropdown.map((country) => (
+                <option key={country.id} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+          <Col md={3}>
+            <Form.Select value={filters.yearsCompulsorySchooling} onChange={(e) => handleFilterChange("yearsCompulsorySchooling", e.target.value)} size="sm">
+              <option value="">All School Years</option>
+              <option value="12">12 Years</option>
+              <option value="13">13 Years</option>
+            </Form.Select>
+          </Col>
+          <Col md={2}>
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={() => {
+                setFilters({ countryId: "", yearsCompulsorySchooling: "" });
+                setCurrentPage(0);
+              }}
+            >
+              Clear
+            </Button>
+          </Col>
+        </Row>
+      </div>
       {isLoading && !showModal ? (
         <div className="text-center py-4">Loading...</div>
       ) : (

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -32,6 +33,29 @@ public class CountryService {
         if (size > 50) size = 50;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
         return countryRepository.findAll(pageable);
+    }
+
+    public Page<Country> searchCountries(Long id, Integer yearsCompulsorySchooling,
+                                         int page, int size, String sortBy, String direction) {
+
+        Specification<Country> countrySpec = (root, query, builder) ->
+                id == null ? null : builder.equal(root.get("id"), id);
+
+        Specification<Country> yearsSpec = (root, query, builder) ->
+                yearsCompulsorySchooling == null ?
+                        null :
+                        builder.equal(root.get("yearsCompulsorySchooling"), yearsCompulsorySchooling);
+
+        Specification<Country> specification = Specification.<Country>unrestricted()
+                .and(countrySpec)
+                .and(yearsSpec);
+
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        return countryRepository.findAll(specification, pageable);
     }
 
     private Country mapToEntity(CountryRegistrationDTO dto) {

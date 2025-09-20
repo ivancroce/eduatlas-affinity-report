@@ -9,7 +9,6 @@ import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.services.BachelorProgramService;
 import com.ivancroce.backend.services.CountryService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -103,5 +102,18 @@ public class CountryController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public void deleteCountry(@PathVariable Long id) {
         countryService.deleteCountry(id);
+    }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<Country> searchCountries(
+            @RequestParam(required = false) Long id,
+            @RequestParam(required = false) Integer yearsCompulsorySchooling,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        return countryService.searchCountries(id, yearsCompulsorySchooling, page, size, sortBy, direction);
     }
 }

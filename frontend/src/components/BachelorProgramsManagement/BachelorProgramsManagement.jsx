@@ -7,6 +7,7 @@ const BachelorProgramsManagement = () => {
   const [programs, setPrograms] = useState([]);
   const [countries, setCountries] = useState([]);
   const [selectedProgram, setSelectedProgram] = useState(null);
+
   const [showModal, setShowModal] = useState(false);
   const [modalMode, setModalMode] = useState("view"); // view, edit, create
   const [isLoading, setIsLoading] = useState(false);
@@ -40,14 +41,19 @@ const BachelorProgramsManagement = () => {
     async (page = 0) => {
       try {
         setIsLoading(true);
-        let url = `/bachelor-programs/search?page=${page}&size=${pageSize}&sort=id&direction=asc`;
+        const hasFilters = filters.countryId || filters.duration || filters.isSpecialProgram;
 
-        if (filters.countryId) url += `&countryId=${filters.countryId}`;
-        if (filters.duration) url += `&duration=${filters.duration}`;
-        if (filters.isSpecialProgram) url += `&isSpecialProgram=${filters.isSpecialProgram}`;
+        let url;
+        if (hasFilters) {
+          url = `/bachelor-programs/search?page=${page}&size=${pageSize}&sort=id&direction=asc`;
+          if (filters.countryId) url += `&countryId=${filters.countryId}`;
+          if (filters.duration) url += `&duration=${filters.duration}`;
+          if (filters.isSpecialProgram) url += `&isSpecialProgram=${filters.isSpecialProgram}`;
+        } else {
+          url = `/bachelor-programs?page=${page}&size=${pageSize}&sort=id&direction=asc`;
+        }
 
         const response = await api.get(url);
-        console.log("Response Data:", response.data);
 
         const pageData = response.data;
 
@@ -251,8 +257,8 @@ const BachelorProgramsManagement = () => {
         </div>
       </div>
       <div className="mb-3">
-        <Row>
-          <Col md={3} className="mb-2 mb-md-0">
+        <Row className="g-3">
+          <Col md={3}>
             <Form.Select value={filters.countryId} onChange={(e) => handleFilterChange("countryId", e.target.value)} size="sm">
               <option value="">All Countries</option>
               {countries.map((country) => (
@@ -262,7 +268,7 @@ const BachelorProgramsManagement = () => {
               ))}
             </Form.Select>
           </Col>
-          <Col md={3} className="mb-2 mb-md-0">
+          <Col md={3}>
             <Form.Select value={filters.duration} onChange={(e) => handleFilterChange("duration", e.target.value)} size="sm">
               <option value="">All Durations</option>
               <option value="1">1 year</option>
@@ -272,14 +278,14 @@ const BachelorProgramsManagement = () => {
               <option value="5">5 years</option>
             </Form.Select>
           </Col>
-          <Col md={3} className="mb-2 mb-md-0">
+          <Col md={3}>
             <Form.Select value={filters.isSpecialProgram} onChange={(e) => handleFilterChange("isSpecialProgram", e.target.value)} size="sm">
               <option value="">All Programs</option>
               <option value="true">Special Only</option>
               <option value="false">Standard Only</option>
             </Form.Select>
           </Col>
-          <Col md={3} className="mb-2 mb-md-0">
+          <Col md={3}>
             <Button
               variant="outline-secondary"
               size="sm"
