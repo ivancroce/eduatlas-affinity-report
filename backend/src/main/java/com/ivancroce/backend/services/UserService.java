@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -57,8 +58,9 @@ public class UserService {
         });
 
         String encodedPassword = passwordEncoder.encode(userDTO.password());
+        Role userRole = userDTO.role() != null ? userDTO.role() : Role.ADMIN;
         User admin = new User(userDTO.username(), userDTO.email(), encodedPassword,
-                Role.ADMIN, userDTO.firstName(), userDTO.lastName());
+                userRole, userDTO.firstName(), userDTO.lastName());
 
         User savedUser = userRepository.save(admin);
         return new UserRespDTO(savedUser.getId());
@@ -73,22 +75,34 @@ public class UserService {
         });
 
         String encodedPassword = passwordEncoder.encode(userDTO.password());
-        User newUser = new User(userDTO.username(), userDTO.email(), encodedPassword,  Role.STUDENT, userDTO.firstName(), userDTO.lastName());
+        Role userRole = userDTO.role() != null ? userDTO.role() : Role.USER;
+        User newUser = new User(userDTO.username(), userDTO.email(), encodedPassword, userRole, userDTO.firstName(), userDTO.lastName());
 
         User savedUser = userRepository.save(newUser);
-        return new UserRespDTO(savedUser.getId());    }
+        return new UserRespDTO(savedUser.getId());
+    }
 
     public User findByIdAndUpdate(Long id, UserUpdateDTO userDTO) {
         User found = this.findById(id);
 
-        if (!found.getUsername().equals(userDTO.username()) &&
-                userRepository.existsByUsername(userDTO.username())) {
+        if (userRepository.existsByUsernameAndIdNot(userDTO.username(), id)) {
             throw new BadRequestException("Username '" + userDTO.username() + "' is already in use!");
         }
 
         found.setUsername(userDTO.username());
+        found.setEmail(userDTO.email());
         found.setFirstName(userDTO.firstName());
         found.setLastName(userDTO.lastName());
+        found.setRole(userDTO.role());
+
+        if (!found.getEmail().equals(userDTO.email()) &&
+                userRepository.existsByEmail(userDTO.email())) {
+            throw new BadRequestException("Email '" + userDTO.email() + "' is already in use!");
+        }
+
+        if (userDTO.password() != null && !userDTO.password().trim().isEmpty()) {
+            found.setPassword(passwordEncoder.encode(userDTO.password()));
+        }
 
         if (userDTO.avatarUrl() != null && !userDTO.avatarUrl().isBlank()) {
             found.setAvatarUrl(userDTO.avatarUrl());
@@ -103,5 +117,41 @@ public class UserService {
     public void findByIdAndDelete(Long id) {
         User found = this.findById(id);
         userRepository.delete(found);
+    }
+
+    public Page<User> searchUsers(String role, String search, int page, int size, String sortBy, String direction) {
+        if (size > 50) size = 50;
+        Specification<User> roleSpec = (root, query, builder) -> {
+            if (role == null || role.isEmpty()) {
+                return null;
+            }
+            return builder.equal(root.get("role"), Role.valueOf(role));
+        };
+
+        Specification<User> searchSpec = (root, query, builder) -> {
+            if (search == null || search.isEmpty()) {
+                return null;
+            }
+            String likePattern = "%" + search.toLowerCase() + "%";
+            return builder.or(
+                    builder.like(builder.lower(root.get("firstName")), likePattern),
+                    builder.like(builder.lower(root.get("lastName")), likePattern),
+                    builder.like(builder.lower(root.get("username")), likePattern),
+                    builder.like(builder.lower(root.get("email")), likePattern)
+            );
+        };
+
+        Specification<User> specification = Specification.<User>unrestricted()
+                .and(roleSpec)
+                .and(searchSpec);
+
+        Sort sort = direction.equalsIgnoreCase("desc") ?
+                Sort.by(sortBy).descending() :
+                Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<User> result = userRepository.findAll(specification, pageable);
+
+        return result;
     }
 }

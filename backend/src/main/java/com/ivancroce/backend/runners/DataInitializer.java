@@ -1,10 +1,11 @@
 package com.ivancroce.backend.runners;
 
 import com.ivancroce.backend.entities.User;
+
 import com.ivancroce.backend.enums.Role;
 import com.ivancroce.backend.payloads.UserRegistrationDTO;
 import com.ivancroce.backend.payloads.UserRespDTO;
-import com.ivancroce.backend.repositories.UserRepository;
+
 import com.ivancroce.backend.services.ExcelImportService;
 import com.ivancroce.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class DataInitializer implements CommandLineRunner {
         User existingAdmin = userService.tryFindByEmail(adminEmail);
         if (existingAdmin == null) {
             UserRegistrationDTO adminDTO = new UserRegistrationDTO(
-                    adminUsername, adminEmail, adminPassword, adminFirstName, adminLastName
+                    adminUsername, adminEmail, adminPassword, adminFirstName, adminLastName, Role.ADMIN
             );
             UserRespDTO createdAdmin = userService.saveAdmin(adminDTO);
             System.out.println("=== Admin user created: " + adminUsername + " (ID: " + createdAdmin.userId() + ") ===");

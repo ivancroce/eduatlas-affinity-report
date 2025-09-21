@@ -1,5 +1,6 @@
 package com.ivancroce.backend.payloads;
 
+import com.ivancroce.backend.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -19,5 +20,6 @@ public record UserRegistrationDTO(@NotBlank(message = "Username is required.")
                                   String firstName,
                                   @NotBlank(message = "Last name is required")
                                   @Size(min = 2, max = 30, message = "Last name must be between 2 and 30 characters")
-                                  String lastName) {
+                                  String lastName,
+                                  Role role) {
 }

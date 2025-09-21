@@ -80,4 +80,17 @@ public class UserController {
     public void findByIdAndDelete(@PathVariable Long id) {
         userService.findByIdAndDelete(id);
     }
+
+    @GetMapping("/search")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public Page<User> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "firstName") String sort,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String search
+    ) {
+         return userService.searchUsers(role, search, page, size, sort, direction);
+    }
 }
