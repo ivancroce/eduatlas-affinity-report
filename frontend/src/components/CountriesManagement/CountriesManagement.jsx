@@ -525,7 +525,7 @@ const CountriesManagement = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={cancelDelete} disabled={isLoading}>
+          <Button variant="primary" onClick={cancelDelete} disabled={isLoading}>
             Cancel
           </Button>
           <Button variant="danger" onClick={handleDelete} disabled={isLoading}>

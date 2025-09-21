@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Pagination } from "react-bootstrap";
 import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
+import "./BachelorProgramsManagement.scss";
 
 const BachelorProgramsManagement = () => {
   const [programs, setPrograms] = useState([]);
@@ -329,9 +330,7 @@ const BachelorProgramsManagement = () => {
                   <td>{program.totalCredits}</td>
                   <td>{program.eqfLevel}</td>
                   <td>{program.isSpecialProgram ? <Badge bg="warning">Special</Badge> : <Badge bg="secondary">Standard</Badge>}</td>
-                  <td className="text-truncate" style={{ maxWidth: "200px" }}>
-                    {program.officialDenomination}
-                  </td>
+                  <td className="text-truncate program-name-cell">{program.officialDenomination}</td>
                   <td className="text-nowrap w-20">
                     <div className="d-flex gap-2 justify-content-center">
                       <Button variant="info" size="sm" onClick={() => handleShowModal("view", program)}>
@@ -553,7 +552,7 @@ const BachelorProgramsManagement = () => {
           </div>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={cancelDelete} disabled={isLoading}>
+          <Button variant="primary" onClick={cancelDelete} disabled={isLoading}>
             Cancel
           </Button>
           <Button variant="danger" onClick={handleDelete} disabled={isLoading}>
