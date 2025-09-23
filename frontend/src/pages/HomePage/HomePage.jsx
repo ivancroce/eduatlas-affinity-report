@@ -3,6 +3,8 @@ import { Container, Row, Col, Form, Button, Card, Alert } from "react-bootstrap"
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./HomePage.scss";
+import { BsArrowLeftRight } from "react-icons/bs";
+import UniversalDropdown from "../../components/UniversalDropdown/UniversalDropdown";
 
 const HomePage = () => {
   const [countries, setCountries] = useState([]);
@@ -71,7 +73,7 @@ const HomePage = () => {
   };
 
   return (
-    <>
+    <div className="home-page">
       {/* Hero Section */}
       <div className="py-5">
         <Container>
@@ -100,42 +102,42 @@ const HomePage = () => {
             <Col lg={8}>
               <Card className="shadow-lg border-0">
                 <Card.Body className="p-5">
-                  <h3 className="text-center mb-4">Compare Degree Programs</h3>
+                  <h3 className="text-center mb-4 text-primary">Compare Degree Programs</h3>
 
                   <Row className="mb-4">
                     <Col md={5}>
                       <Form.Group>
-                        <Form.Label className="fw-bold text-primary">Country 1</Form.Label>
-                        <Form.Select value={country1} onChange={(e) => setCountry1(e.target.value)} size="lg">
-                          <option value="">Select Country</option>
-                          {countries.map((country) => (
-                            <option key={country.id} value={country.id}>
-                              {country.name}
-                            </option>
-                          ))}
-                        </Form.Select>
-                        <Form.Text className="text-muted">First country for comparison</Form.Text>
+                        <UniversalDropdown
+                          type="countries"
+                          countries={countries}
+                          value={country1}
+                          onChange={(e) => setCountry1(e.target.value)}
+                          placeholder="Select Country"
+                          size="lg"
+                          showSearch={true}
+                          showAllCountries={false}
+                        />
                       </Form.Group>
                     </Col>
 
                     <Col md={2} className="d-flex align-items-center justify-content-center">
-                      <div className="comparison-arrow mt-2 mt-md-0">
-                        <i className="bi bi-arrow-left-right display-6 text-secondary"></i>
+                      <div className="my-2 my-md-0">
+                        <BsArrowLeftRight className="text-secondary" size={32} />
                       </div>
                     </Col>
 
                     <Col md={5}>
                       <Form.Group>
-                        <Form.Label className="fw-bold text-primary">Country 2</Form.Label>
-                        <Form.Select value={country2} onChange={(e) => setCountry2(e.target.value)} size="lg">
-                          <option value="">Select Country</option>
-                          {countries.map((country) => (
-                            <option key={country.id} value={country.id}>
-                              {country.name}
-                            </option>
-                          ))}
-                        </Form.Select>
-                        <Form.Text className="text-muted">Second country for comparison</Form.Text>
+                        <UniversalDropdown
+                          type="countries"
+                          countries={countries}
+                          value={country2}
+                          onChange={(e) => setCountry2(e.target.value)}
+                          placeholder="Select Country"
+                          size="lg"
+                          showSearch={true}
+                          showAllCountries={false}
+                        />
                       </Form.Group>
                     </Col>
                   </Row>
@@ -224,7 +226,7 @@ const HomePage = () => {
           </Row>
         </Container>
       </div>
-    </>
+    </div>
   );
 };
 

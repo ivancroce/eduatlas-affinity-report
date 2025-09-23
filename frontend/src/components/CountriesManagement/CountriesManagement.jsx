@@ -3,6 +3,9 @@ import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Pagination } from "
 import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
 import "./CountriesManagement.scss";
+import CountryFlag from "../CountryFlag/CountryFlag";
+import UniversalDropdown from "../UniversalDropdown/UniversalDropdown";
+import CustomSelectDropdown from "../CustomSelectDropdown/CustomSelectDropdown";
 
 const CountriesManagement = () => {
   const [countries, setCountries] = useState([]);
@@ -34,7 +37,8 @@ const CountriesManagement = () => {
     name: "",
     yearsCompulsorySchooling: "",
     gradingSystem: "",
-    creditRatio: ""
+    creditRatio: "",
+    countryCode: ""
   });
 
   const fetchCountries = useCallback(
@@ -106,14 +110,16 @@ const CountriesManagement = () => {
         name: country.name || "",
         yearsCompulsorySchooling: country.yearsCompulsorySchooling || "",
         gradingSystem: country.gradingSystem || "",
-        creditRatio: country.creditRatio || ""
+        creditRatio: country.creditRatio || "",
+        countryCode: country.countryCode || ""
       });
     } else {
       setFormData({
         name: "",
         yearsCompulsorySchooling: "",
         gradingSystem: "",
-        creditRatio: ""
+        creditRatio: "",
+        countryCode: ""
       });
     }
 
@@ -136,7 +142,8 @@ const CountriesManagement = () => {
       name: "",
       yearsCompulsorySchooling: "",
       gradingSystem: "",
-      creditRatio: ""
+      creditRatio: "",
+      countryCode: ""
     });
     setError("");
     setSuccess("");
@@ -230,6 +237,12 @@ const CountriesManagement = () => {
     setCurrentPage(0);
   };
 
+  const schoolYearOptions = [
+    { value: "", label: "All School Years" },
+    { value: "12", label: "12 Years" },
+    { value: "13", label: "13 Years" }
+  ];
+
   return (
     <div>
       {error && <Alert variant="danger">{error}</Alert>}
@@ -245,25 +258,31 @@ const CountriesManagement = () => {
       <div className="mb-3">
         <Row className="g-3">
           <Col md={3}>
-            <Form.Select value={filters.countryId} onChange={(e) => handleFilterChange("countryId", e.target.value)} size="sm">
-              <option value="">All Countries</option>
-              {allCountriesForDropdown.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </Form.Select>
+            <UniversalDropdown
+              type="countries"
+              countries={allCountriesForDropdown}
+              value={filters.countryId}
+              onChange={(e) => handleFilterChange("countryId", e.target.value)}
+              placeholder="All Countries"
+              size="sm"
+              showSearch={true}
+              showAllCountries={true}
+            />
           </Col>
           <Col md={3}>
-            <Form.Select value={filters.yearsCompulsorySchooling} onChange={(e) => handleFilterChange("yearsCompulsorySchooling", e.target.value)} size="sm">
-              <option value="">All School Years</option>
-              <option value="12">12 Years</option>
-              <option value="13">13 Years</option>
-            </Form.Select>
+            <UniversalDropdown
+              type="generic"
+              options={schoolYearOptions}
+              value={filters.yearsCompulsorySchooling}
+              onChange={(e) => handleFilterChange("yearsCompulsorySchooling", e.target.value)}
+              placeholder="All School Years"
+              size="sm"
+              showSearch={false}
+            />
           </Col>
           <Col md={2}>
             <Button
-              variant="outline-secondary"
+              variant="primary"
               size="sm"
               onClick={() => {
                 setFilters({ countryId: "", yearsCompulsorySchooling: "" });
@@ -283,10 +302,11 @@ const CountriesManagement = () => {
             <tr>
               <th>ID</th>
               <th>Country Name</th>
+              <th>Country Code</th>
               <th>Years Schooling</th>
               <th>Grading System</th>
               <th>Credit Ratio</th>
-              <th className="w-20">Actions</th>
+              <th className="text-nowrap actions-cell">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -294,11 +314,17 @@ const CountriesManagement = () => {
               countries.map((country) => (
                 <tr key={country.id}>
                   <td>{country.id}</td>
-                  <td>{country.name}</td>
+                  <td className="text-start">
+                    <div className="d-flex align-items-center">
+                      <CountryFlag countryCode={country.countryCode} countryName={country.name} />
+                      {country.name}
+                    </div>
+                  </td>
+                  <td>{country.countryCode}</td>
                   <td>{country.yearsCompulsorySchooling}</td>
                   <td>{country.gradingSystem}</td>
                   <td>{country.creditRatio}</td>
-                  <td className="text-nowrap w-20">
+                  <td>
                     <div className="d-flex gap-2 justify-content-center">
                       <Button variant="info" size="sm" onClick={() => handleShowPrograms(country)}>
                         <BsEye />
@@ -315,7 +341,7 @@ const CountriesManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="6" className="text-center">
+                <td colSpan="7" className="text-center">
                   {isLoading ? "Loading..." : "No countries found"}
                 </td>
               </tr>
@@ -392,7 +418,7 @@ const CountriesManagement = () => {
 
           <Form onSubmit={handleSubmit}>
             <Row>
-              <Col md={6}>
+              <Col md={8}>
                 <Form.Group className="mb-3">
                   <Form.Label>Country Name</Form.Label>
                   <Form.Control
@@ -401,6 +427,22 @@ const CountriesManagement = () => {
                     value={formData.name}
                     onChange={handleInputChange}
                     disabled={modalMode === "view" || isLoading}
+                    required
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={4}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Country Code</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="countryCode"
+                    value={formData.countryCode}
+                    onChange={handleInputChange}
+                    disabled={modalMode === "view" || isLoading}
+                    placeholder="e.g., IT, US, DE"
+                    maxLength="2"
+                    className="text-uppercase"
                     required
                   />
                 </Form.Group>

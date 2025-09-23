@@ -1,0 +1,5 @@
+@use "../../styles/dropdown-mixins" as *;
+
+.universal-dropdown {
+  @include dropdown-base;
+}

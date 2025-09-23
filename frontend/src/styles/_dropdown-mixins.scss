@@ -1,0 +1,57 @@
+@use "./variables" as *;
+
+@mixin dropdown-base {
+  &__toggle {
+    border-color: $primary !important;
+    color: $primary !important;
+    background-color: white !important;
+
+    &.has-selection {
+      background-color: $hover-blue-light !important;
+    }
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $hover-blue-light !important;
+      border-color: $primary !important;
+
+      .placeholder-text {
+        color: $primary !important;
+      }
+    }
+  }
+
+  &__menu {
+    max-height: 350px;
+    border: 1px solid $primary !important;
+
+    .dropdown-item {
+      &:hover,
+      &:focus {
+        background-color: $hover-blue-light !important;
+        color: $primary !important;
+      }
+    }
+  }
+
+  &__search {
+    padding: 0.5rem;
+    padding-top: 0;
+    border-bottom: 1px solid $bg-gray;
+
+    .form-control {
+      border: 1;
+      background-color: $bg-gray;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+  &__content {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+}
