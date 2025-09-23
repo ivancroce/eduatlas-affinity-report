@@ -3,6 +3,8 @@ import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Pagination } from "
 import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
 import "./BachelorProgramsManagement.scss";
+import CountryFlag from "../CountryFlag/CountryFlag";
+import UniversalDropdown from "../UniversalDropdown/UniversalDropdown";
 
 const BachelorProgramsManagement = () => {
   const [programs, setPrograms] = useState([]);
@@ -243,6 +245,26 @@ const BachelorProgramsManagement = () => {
     return program.duration?.toString() || "";
   };
 
+  const getCountryData = (program) => {
+    const country = countries.find((c) => c.id === program.countryId);
+    return country || null;
+  };
+
+  const durationOptions = [
+    { value: "", label: "All Durations" },
+    { value: "1", label: "1 year" },
+    { value: "2", label: "2 years" },
+    { value: "3", label: "3 years" },
+    { value: "4", label: "4 years" },
+    { value: "5", label: "5 years" }
+  ];
+
+  const specialProgramOptions = [
+    { value: "", label: "All Programs" },
+    { value: "true", label: "Special Only" },
+    { value: "false", label: "Standard Only" }
+  ];
+
   return (
     <div>
       {error && <Alert variant="danger">{error}</Alert>}
@@ -260,35 +282,42 @@ const BachelorProgramsManagement = () => {
       <div className="mb-3">
         <Row className="g-3">
           <Col md={3}>
-            <Form.Select value={filters.countryId} onChange={(e) => handleFilterChange("countryId", e.target.value)} size="sm">
-              <option value="">All Countries</option>
-              {countries.map((country) => (
-                <option key={country.id} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </Form.Select>
+            <UniversalDropdown
+              type="countries"
+              countries={countries}
+              value={filters.countryId}
+              onChange={(e) => handleFilterChange("countryId", e.target.value)}
+              placeholder="All Countries"
+              size="sm"
+              showAllCountries={true}
+              showSearch={true}
+            />
           </Col>
           <Col md={3}>
-            <Form.Select value={filters.duration} onChange={(e) => handleFilterChange("duration", e.target.value)} size="sm">
-              <option value="">All Durations</option>
-              <option value="1">1 year</option>
-              <option value="2">2 years</option>
-              <option value="3">3 years</option>
-              <option value="4">4 years</option>
-              <option value="5">5 years</option>
-            </Form.Select>
+            <UniversalDropdown
+              type="generic"
+              options={durationOptions}
+              value={filters.duration}
+              onChange={(e) => handleFilterChange("duration", e.target.value)}
+              placeholder="All Durations"
+              size="sm"
+              showSearch={false}
+            />
           </Col>
           <Col md={3}>
-            <Form.Select value={filters.isSpecialProgram} onChange={(e) => handleFilterChange("isSpecialProgram", e.target.value)} size="sm">
-              <option value="">All Programs</option>
-              <option value="true">Special Only</option>
-              <option value="false">Standard Only</option>
-            </Form.Select>
+            <UniversalDropdown
+              type="generic"
+              options={specialProgramOptions}
+              value={filters.isSpecialProgram}
+              onChange={(e) => handleFilterChange("isSpecialProgram", e.target.value)}
+              placeholder="All Programs"
+              size="sm"
+              showSearch={false}
+            />
           </Col>
           <Col md={3}>
             <Button
-              variant="outline-secondary"
+              variant="primary"
               size="sm"
               onClick={() => {
                 setFilters({ countryId: "", duration: "", isSpecialProgram: "", eqfLevel: "" });
@@ -307,7 +336,7 @@ const BachelorProgramsManagement = () => {
           <thead className="table-secondary">
             <tr>
               <th>ID</th>
-              <th>Country</th>
+              <th className="country-name-cell text-nowrap">Country</th>
               <th>Country ID</th>
               <th>Duration (Years)</th>
               <th>Credits/Year</th>
@@ -315,7 +344,7 @@ const BachelorProgramsManagement = () => {
               <th>EQF Level</th>
               <th>Special Program</th>
               <th>Official Denomination</th>
-              <th className="w-20">Actions</th>
+              <th className="text-nowrap actions-cell">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -323,7 +352,21 @@ const BachelorProgramsManagement = () => {
               programs.map((program) => (
                 <tr key={program.id}>
                   <td>{program.id}</td>
-                  <td>{getCountryName(program)}</td>
+                  <td className="text-start">
+                    {(() => {
+                      const countryData = getCountryData(program);
+                      return countryData ? (
+                        <>
+                          <div className="d-flex align-items-center">
+                            <CountryFlag countryCode={countryData.countryCode} countryName={countryData.name} size="16x12" />
+                            {countryData.name}
+                          </div>
+                        </>
+                      ) : (
+                        "Unknown Country"
+                      );
+                    })()}
+                  </td>
                   <td>{program.countryId}</td>
                   <td>{formatDuration(program)}</td>
                   <td>{program.creditsPerYear}</td>
@@ -331,7 +374,7 @@ const BachelorProgramsManagement = () => {
                   <td>{program.eqfLevel}</td>
                   <td>{program.isSpecialProgram ? <Badge bg="warning">Special</Badge> : <Badge bg="secondary">Standard</Badge>}</td>
                   <td className="text-truncate program-name-cell">{program.officialDenomination}</td>
-                  <td className="text-nowrap w-20">
+                  <td>
                     <div className="d-flex gap-2 justify-content-center">
                       <Button variant="info" size="sm" onClick={() => handleShowModal("view", program)}>
                         <BsEye />

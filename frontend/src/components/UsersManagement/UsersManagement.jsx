@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Table, Button, Modal, Form, Alert, Badge, Row, Col, Pagination, Image } from "react-bootstrap";
 import { BsPencilSquare, BsTrash, BsPlus, BsEye, BsExclamationTriangle } from "react-icons/bs";
 import api from "../../api/axios";
+import UniversalDropdown from "../UniversalDropdown/UniversalDropdown";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -224,11 +225,11 @@ const UserManagement = () => {
       case "ADMIN":
         return "danger";
       case "USER":
-        return "primary";
+        return "secondary";
       case "STUDENT":
         return "info";
       default:
-        return "secondary";
+        return "primary";
     }
   };
 
@@ -239,6 +240,13 @@ const UserManagement = () => {
     }));
     setCurrentPage(0);
   };
+
+  const roleOptions = [
+    { value: "", label: "All Roles" },
+    { value: "ADMIN", label: "Admin" },
+    { value: "USER", label: "User" },
+    { value: "STUDENT", label: "Student" }
+  ];
 
   return (
     <div>
@@ -260,22 +268,26 @@ const UserManagement = () => {
               placeholder="Search by name, username, or email"
               value={filters.search}
               onChange={(e) => handleFilterChange("search", e.target.value)}
+              className="border-primary shadow-none"
               size="sm"
             />
           </Col>
 
           <Col md={2}>
-            <Form.Select value={filters.role} onChange={(e) => handleFilterChange("role", e.target.value)} size="sm">
-              <option value="">All Roles</option>
-              <option value="ADMIN">Admin</option>
-              <option value="USER">User</option>
-              <option value="STUDENT">Student</option>
-            </Form.Select>
+            <UniversalDropdown
+              type="generic"
+              options={roleOptions}
+              value={filters.role}
+              onChange={(e) => handleFilterChange("role", e.target.value)}
+              placeholder="All Roles"
+              size="sm"
+              showSearch={false}
+            />
           </Col>
 
           <Col md={2}>
             <Button
-              variant="outline-secondary"
+              variant="primary"
               size="sm"
               onClick={() => {
                 setFilters({ role: "", search: "" });
@@ -315,7 +327,7 @@ const UserManagement = () => {
                   <td>
                     <Badge bg={getRoleBadgeColor(user.role)}>{user.role}</Badge>
                   </td>
-                  <td>{user.avatarUrl && <Image src={user.avatarUrl} alt="Avatar" style={{ width: "40px", height: "40px", borderRadius: "50%" }} />}</td>
+                  <td>{user.avatarUrl && <Image src={user.avatarUrl} alt="Avatar" className="rounded-circle" width={40} height={40} />}</td>
                   <td className="text-nowrap w-20">
                     <div className="d-flex gap-2 justify-content-center">
                       <Button variant="info" size="sm" className="me-2" onClick={() => handleShowModal("view", user)}>
