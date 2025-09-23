@@ -5,7 +5,6 @@ import api from "../../api/axios";
 import "./CountriesManagement.scss";
 import CountryFlag from "../CountryFlag/CountryFlag";
 import UniversalDropdown from "../UniversalDropdown/UniversalDropdown";
-import CustomSelectDropdown from "../CustomSelectDropdown/CustomSelectDropdown";
 
 const CountriesManagement = () => {
   const [countries, setCountries] = useState([]);
