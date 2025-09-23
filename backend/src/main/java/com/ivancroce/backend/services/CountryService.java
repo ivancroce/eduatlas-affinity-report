@@ -63,7 +63,8 @@ public class CountryService {
                 dto.name(),
                 dto.yearsCompulsorySchooling(),
                 dto.gradingSystem(),
-                dto.creditRatio()
+                dto.creditRatio(),
+                dto.countryCode()
         );
     }
 
@@ -82,6 +83,7 @@ public class CountryService {
         country.setYearsCompulsorySchooling(dto.yearsCompulsorySchooling());
         country.setGradingSystem(dto.gradingSystem());
         country.setCreditRatio(dto.creditRatio());
+        country.setCountryCode(dto.countryCode());
     }
 
     public Country findCountryByIdAndUpdate(Long id, CountryRegistrationDTO dto) {
@@ -107,6 +109,6 @@ public class CountryService {
         List<Country> countries = countryRepository.findAll(Sort.by("name"));
 
         return countries.stream()
-                .map(country -> new CountryRespDTO(country.getId(), country.getName()))
+                .map(country -> new CountryRespDTO(country.getId(), country.getName(), country.getCountryCode()))
                 .toList();
 }}

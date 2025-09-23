@@ -58,10 +58,11 @@ public class ExcelImportService {
             Integer yearsSchooling = parseIntegerWithAsterisk(getCellValueAsString(row.getCell(1))); // "13*" -> 13
             String gradingSystem = parseGradingSystem(row);
             String creditRatio = getCellValueAsString(row.getCell(23));
+            String countryCode = getCellValueAsString(row.getCell(24));
 
             if (name != null && yearsSchooling != null) {
                 return new Country(name, yearsSchooling,
-                        gradingSystem, creditRatio);
+                        gradingSystem, creditRatio, countryCode);
             }
 
             if (creditRatio == null || creditRatio.trim().isEmpty()) {

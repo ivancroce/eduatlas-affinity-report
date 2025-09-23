@@ -16,6 +16,9 @@ public record CountryRegistrationDTO(
         @NotBlank(message = "Credit ratio is required")
         @Pattern(regexp = "^\\d+(/\\d+)?$",
                 message = "Credit ratio must be a number or number/number format (e.g., 30 or 25/30)")
-        String creditRatio
+        String creditRatio,
+        @NotBlank
+        @Size(min = 2, max = 2, message = "Country code is required")
+        String countryCode
 ) {
 }

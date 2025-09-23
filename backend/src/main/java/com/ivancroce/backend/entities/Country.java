@@ -26,14 +26,17 @@ public class Country {
     private String gradingSystem;
     @Column(name="credit_ratio")
     private String creditRatio;
+    @Column(name = "country_code", length = 2)
+    private String countryCode;
     @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore
     private List<BachelorProgram> bachelorPrograms = new ArrayList<>();
 
-    public Country(String name, Integer yearsCompulsorySchooling, String gradingSystem, String creditRatio) {
+    public Country(String name, Integer yearsCompulsorySchooling, String gradingSystem, String creditRatio, String countryCode) {
         this.name = name;
         this.yearsCompulsorySchooling = yearsCompulsorySchooling;
         this.gradingSystem = gradingSystem;
         this.creditRatio = creditRatio;
+        this.countryCode = countryCode;
     }
 }
