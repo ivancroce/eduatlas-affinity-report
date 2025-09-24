@@ -3,7 +3,6 @@ import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
 import { jwtDecode } from "jwt-decode";
-import { BsArrowLeft } from "react-icons/bs";
 import "./LoginPage.scss";
 import { useAvailableHeight } from "../../hooks/useAvailableHeight";
 
@@ -66,24 +65,26 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-page-container full-page-container">
+    <div className="full-page-container d-flex align-items-center">
       <Container>
         <Row className="justify-content-center align-items-center min-h-70vh">
           <Col md={6} lg={4}>
-            <div className="mb-3">
-              <Button variant="link" className="text-decoration-none p-0 d-flex align-items-center" onClick={() => navigate("/")}>
-                <BsArrowLeft className="me-2" size={20} />
-                Back to Home
-              </Button>
-            </div>
-            <div className="p-4 login-card bg-light">
-              <h3 className="text-center mb-4">Login</h3>
+            <div className="bg-white rounded-3 shadow-sm p-4">
+              <h3 className="text-center mb-4 text-primary fw-semibold">Login</h3>
               {error && <Alert variant="danger">{error}</Alert>}
 
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicEmail">
                   <Form.Label>Email</Form.Label>
-                  <Form.Control type="email" placeholder="Enter email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
+                  <Form.Control
+                    type="email"
+                    placeholder="Enter email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="login-input"
+                  />
                 </Form.Group>
 
                 <Form.Group className="mb-3" controlId="formBasicPassword">
@@ -95,11 +96,12 @@ const LoginPage = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     disabled={isLoading}
+                    className="login-input"
                   />
                 </Form.Group>
 
                 <div className="d-grid">
-                  <Button variant="secondary" type="submit" disabled={isLoading}>
+                  <Button variant="secondary" type="submit" disabled={isLoading} className="login-submit-btn fw-semibold" size="lg">
                     {isLoading ? "Logging in..." : "Login"}
                   </Button>
                 </div>

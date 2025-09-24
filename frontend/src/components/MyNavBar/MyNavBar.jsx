@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { BsGear, BsArrowRightSquare, BsHouseDoor, BsExclamationTriangle } from "react-icons/bs";
 import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
-
 import westcliffLogo from "../../../assets/images/logo.png";
 import westcliffMinLogo from "../../../assets/images/min-logo.png";
 import eduAtlasBigLogo from "../../../assets/images/eduatlas-big-logo.png";
@@ -49,8 +48,7 @@ const MyNavBar = () => {
       setUserRole(newRole);
     };
 
-    const handleUserLogin = (event) => {
-      console.log("User logged in:", event.detail);
+    const handleUserLogin = () => {
       const newRole = checkUserRole();
       setUserRole(newRole);
     };
@@ -87,7 +85,7 @@ const MyNavBar = () => {
     return (
       <Navbar bg="primary">
         <Container>
-          <Navbar.Brand className="navbar-westcliff d-flex align-items-center" onClick={() => navigate("/")}>
+          <Navbar.Brand className="d-flex align-items-center" onClick={() => navigate("/")}>
             <Image src={westcliffLogo} height="60" className="me-3 d-none d-sm-inline-block" alt="Westcliff University" />
             <Image src={westcliffMinLogo} height="60" className="me-3 d-inline-block d-sm-none" alt="Westcliff University" />
             <Image src={eduAtlasBigLogo} height="40" className="me-3" alt="EduAtlas" />
@@ -114,12 +112,7 @@ const MyNavBar = () => {
                 <BsHouseDoor size={20} className="me-1" />
                 Home
               </Nav.Link>
-              {!userRole ? (
-                <Button variant="outline-light" size="sm" onClick={() => navigate("/login")} title="Admin Login" className="d-flex align-items-center">
-                  <BsGear size={20} className="me-1" />
-                  Login
-                </Button>
-              ) : (
+              {userRole && (
                 <NavDropdown
                   title={
                     <span className="text-light">

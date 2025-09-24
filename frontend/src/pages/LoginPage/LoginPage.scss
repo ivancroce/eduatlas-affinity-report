@@ -1,9 +1,14 @@
-.login-page-container {
-  display: flex;
-  align-items: center;
+@use "sass:color";
+@use "../../styles/variables" as *;
+
+.login-input:focus {
+  border-color: $secondary;
+  box-shadow: 0 0 0 0.2rem rgba(20, 108, 168, 0.25);
 }
 
-.login-card {
-  border-radius: 1rem;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+.login-submit-btn {
+  &:hover:not(:disabled) {
+    background-color: color.scale($secondary, $lightness: -8%);
+    border-color: color.scale($secondary, $lightness: -8%);
+  }
 }

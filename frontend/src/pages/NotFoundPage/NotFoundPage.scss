@@ -1,3 +1,4 @@
+@use "sass:color";
 @use "../../styles/variables" as *;
 
 .not-found-container {
@@ -39,8 +40,8 @@
 
   &:hover,
   &:focus {
-    background-color: darken($primary, 8%);
-    border-color: darken($primary, 8%);
+    background-color: color.scale($primary, $lightness: -8%);
+    border-color: color.scale($primary, $lightness: -8%);
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 39, 90, 0.25);
   }
@@ -66,7 +67,7 @@
 
   &:active {
     transform: translateY(0);
-    background-color: darken($secondary, 5%) !important;
-    border-color: darken($secondary, 5%) !important;
+    background-color: color.scale($secondary, $lightness: -5%) !important;
+    border-color: color.scale($secondary, $lightness: -5%) !important;
   }
 }
