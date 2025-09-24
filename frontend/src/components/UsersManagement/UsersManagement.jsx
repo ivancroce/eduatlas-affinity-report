@@ -69,7 +69,6 @@ const UserManagement = () => {
           url = `/users?page=${page}&size=${pageSize}&sort=firstName&direction=asc`;
         }
 
-        console.log("Fetching URL:", url);
         const response = await api.get(url);
         const pageData = response.data;
 
