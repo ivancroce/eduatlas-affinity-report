@@ -2,6 +2,12 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Card, Table, Button, Badge, Alert, Image } from "react-bootstrap";
 import eduatlasLogo from "../../../assets/images/eduatlas-logo.png";
 import "./AffinityReportPage.scss";
+import CountryFlag from "../../components/CountryFlag/CountryFlag";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+import { BsInfoCircle } from "react-icons/bs";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const AffinityReportPage = () => {
   const location = useLocation();
@@ -56,7 +62,17 @@ const AffinityReportPage = () => {
     return { level: "LOW", color: "danger" };
   };
 
-  // Calculate Overall Affinity
+  const calculateAffinityPercentage = (affinities) => {
+    const comparableAffinities = affinities.filter((affinity) => affinity.level !== "CAN ALWAYS BE CONVERTED" && affinity.level !== "");
+
+    const equivalentCount = comparableAffinities.filter((a) => a.level === "EQUIVALENT").length;
+    const moderateCount = comparableAffinities.filter((a) => a.level === "MODERATE").length;
+    const totalCount = comparableAffinities.length;
+
+    const score = (equivalentCount * 100 + moderateCount * 60) / totalCount;
+    return Math.round(score);
+  };
+
   const calculateOverallAffinity = (affinities) => {
     const comparableAffinities = affinities.filter((affinity) => affinity.level !== "CAN ALWAYS BE CONVERTED" && affinity.level !== "");
 
@@ -81,6 +97,7 @@ const AffinityReportPage = () => {
   const eqfAffinity = calculateEqfAffinity(country1.program.eqfLevel, country2.program.eqfLevel);
 
   const affinitiesForOverall = [durationAffinity, creditsAffinity, creditRatioAffinity, eqfAffinity];
+  const affinityPercentage = calculateAffinityPercentage(affinitiesForOverall);
   const overallAffinity = calculateOverallAffinity(affinitiesForOverall);
 
   // For Poland having 3.5 Duration BA
@@ -168,62 +185,37 @@ const AffinityReportPage = () => {
 
         <Card.Body className="p-0">
           {/* Selection Summary */}
-          <div className="bg-light p-4 border-bottom">
-            <Row className="text-center">
-              <Col md={4}>
-                <div>
-                  <strong>Country 1</strong>
-                  <div className="mt-2">
-                    <Badge bg="primary" className="px-3 py-2 fs-6">
-                      {country1.name}
-                    </Badge>
-                  </div>
-                  <small className="text-muted">First country for comparison</small>
-                </div>
-              </Col>
-              <Col md={4}>
-                <div>
-                  <strong>Country 2</strong>
-                  <div className="mt-2">
-                    <Badge bg="primary" className="px-3 py-2 fs-6">
-                      {country2.name}
-                    </Badge>
-                  </div>
-                  <small className="text-muted">Second country for comparison</small>
-                </div>
-              </Col>
-              <Col md={4}>
-                <div>
-                  <strong>Grade</strong>
-                  <div className="mt-2">
-                    <Badge bg="primary" className="px-3 py-2 fs-6">
-                      Bachelor
-                    </Badge>
-                  </div>
-                  <small className="text-muted">Degree level</small>
-                </div>
-              </Col>
-            </Row>
+          <div className="bg-primary p-3 text-center border-bottom">
+            <small className="text-accent fs-6">Academic Equivalency Analysis</small>
           </div>
-
           {/* Comparison Table */}
           <div className="table-responsive">
             <Table className="mb-0" bordered>
               <thead className="table-secondary">
-                <tr>
+                <tr className="border-top-0">
                   <th className="w-20"></th>
-                  <th className="text-center w-25">{country1.name.toUpperCase()}</th>
-                  <th className="text-center w-25">{country2.name.toUpperCase()}</th>
+                  <th className="w-25">
+                    <div className="d-flex align-items-center justify-content-center">
+                      <CountryFlag countryCode={country1.countryCode} countryName={country1.name} size="16x12" className="me-2" />
+                      {country1.name.toUpperCase()}
+                    </div>
+                  </th>
+                  <th className="w-25 numeric-cell">
+                    <div className="d-flex align-items-center justify-content-center">
+                      <CountryFlag countryCode={country2.countryCode} countryName={country2.name} size="16x12" className="me-2" />
+                      {country2.name.toUpperCase()}
+                    </div>
+                  </th>
                   <th className="text-center w-30">AFFINITY</th>
                 </tr>
               </thead>
               <tbody>
                 {comparisonData.map((row, index) => (
-                  <tr key={index}>
-                    <td className="fw-bold bg-light">{row.category}</td>
-                    <td className="text-center">{row.country1Value}</td>
-                    <td className="text-center">{row.country2Value}</td>
-                    <td className="text-center">
+                  <tr key={index} className="text-center">
+                    <td className="fw-semibold bg-light text-start">{row.category}</td>
+                    <td>{row.country1Value}</td>
+                    <td>{row.country2Value}</td>
+                    <td>
                       {row.affinity.level && (
                         <Badge bg={row.affinity.color} className="px-3 py-2 fs-6">
                           {row.affinity.level}
@@ -260,6 +252,7 @@ const AffinityReportPage = () => {
                   </p>
                   {(country1.hasSpecialPrograms || country2.hasSpecialPrograms) && (
                     <div className="mt-3 p-3 bg-info bg-opacity-10 border border-info rounded">
+                      <BsInfoCircle className="text-info me-2" />
                       <small className="text-muted">
                         <strong>Note:</strong>{" "}
                         {country1.hasSpecialPrograms && country2.hasSpecialPrograms
@@ -276,8 +269,33 @@ const AffinityReportPage = () => {
                 <div className="text-center h-100">
                   <div className="border rounded p-3 bg-white h-100 d-flex flex-column justify-content-center">
                     <h6 className="fw-bold mb-3">FINAL AFFINITY RATE</h6>
+
+                    {/* Doughnut Chart */}
+                    <div className="mb-3 position-relative doughnut-wrapper">
+                      <Doughnut
+                        data={{
+                          datasets: [
+                            {
+                              data: [affinityPercentage, 100 - affinityPercentage],
+                              backgroundColor: ["#00275A", "#146CA8"],
+                              borderWidth: 0,
+                              cutout: "65%"
+                            }
+                          ]
+                        }}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          plugins: { legend: { display: false } }
+                        }}
+                      />
+                      <div className="position-absolute top-50 start-50 translate-middle text-center">
+                        <h3 className="mb-0 text-primary fw-semibold">{affinityPercentage}%</h3>
+                      </div>
+                    </div>
+
                     <div className={`p-3 rounded bg-${overallAffinity.color} bg-opacity-10 border border-${overallAffinity.color}`}>
-                      <Badge bg={overallAffinity.color} className="px-3 py-2 fs-6 fs-md-5 mb-2 ">
+                      <Badge bg={overallAffinity.color} className="px-3 py-2 fs-6 fs-md-5 mb-2">
                         {overallAffinity.level}
                       </Badge>
                       <div className="small text-muted">{overallAffinity.breakdown}</div>

@@ -1,5 +1,6 @@
+@use "../../styles/variables" as *;
+
 .disclaimer-text {
-  font-size: 0.8rem;
   line-height: 1.3;
 }
 
@@ -10,4 +11,12 @@
 
 .logo-sm {
   max-width: 120px;
+}
+
+.text-accent {
+  color: $accent;
+}
+
+.doughnut-wrapper {
+  height: 140px;
 }

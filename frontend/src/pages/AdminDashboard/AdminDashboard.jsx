@@ -16,7 +16,7 @@ const AdminDashboard = () => {
             <BsGear size={32} className="text-primary me-3" />
             <div>
               <h1 className="mb-1 text-primary">Admin Dashboard</h1>
-              <p className="text-muted mb-0">Manage countries and users data</p>
+              <p className="text-muted mb-0">Manage countries, programs and users data</p>
             </div>
           </div>
 
