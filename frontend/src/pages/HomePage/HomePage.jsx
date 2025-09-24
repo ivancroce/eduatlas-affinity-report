@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BsArrowLeftRight } from "react-icons/bs";
 import UniversalDropdown from "../../components/UniversalDropdown/UniversalDropdown";
+import { useAvailableHeight } from "../../hooks/useAvailableHeight";
 
 const HomePage = () => {
   const [countries, setCountries] = useState([]);
@@ -12,6 +13,7 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
+  useAvailableHeight();
 
   useEffect(() => {
     fetchCountries();
@@ -72,159 +74,157 @@ const HomePage = () => {
   };
 
   return (
-    <div className="home-page">
+    <div className="full-page-container">
       {/* Hero Section */}
-      <div className="py-5">
-        <Container>
-          {errorMessage && (
-            <Row className="justify-content-center mb-4">
-              <Col lg={8}>
-                <Alert variant={errorMessage.type || "warning"} onClose={() => setErrorMessage("")} dismissible>
-                  {errorMessage.text || errorMessage}
-                </Alert>
-              </Col>
-            </Row>
-          )}
-          <Row className="text-center mb-5">
-            <Col>
-              <h1 className="display-4 fw-normal text-primary mb-3">
-                Bachelor's Degree <span className="text-secondary">Affinity Report</span>
-              </h1>
-              <p className="lead fw-normal text-muted">
-                Compare international bachelor degree programs and discover academic equivalencies between different education systems worldwide.
-              </p>
-            </Col>
-          </Row>
-
-          {/* Comparison Form */}
-          <Row className="justify-content-center">
+      <Container className="py-5">
+        {errorMessage && (
+          <Row className="justify-content-center mb-4">
             <Col lg={8}>
-              <Card className="shadow-lg border-0">
-                <Card.Body className="p-5">
-                  <h3 className="text-center mb-4 text-primary">Compare Degree Programs</h3>
-
-                  <Row className="mb-4">
-                    <Col md={5}>
-                      <Form.Group>
-                        <UniversalDropdown
-                          type="countries"
-                          countries={countries}
-                          value={country1}
-                          onChange={(e) => setCountry1(e.target.value)}
-                          placeholder="Select Country"
-                          size="lg"
-                          showSearch={true}
-                          showAllCountries={false}
-                        />
-                      </Form.Group>
-                    </Col>
-
-                    <Col md={2} className="d-flex align-items-center justify-content-center">
-                      <div className="my-2 my-md-0">
-                        <BsArrowLeftRight className="text-secondary" size={32} />
-                      </div>
-                    </Col>
-
-                    <Col md={5}>
-                      <Form.Group>
-                        <UniversalDropdown
-                          type="countries"
-                          countries={countries}
-                          value={country2}
-                          onChange={(e) => setCountry2(e.target.value)}
-                          placeholder="Select Country"
-                          size="lg"
-                          showSearch={true}
-                          showAllCountries={false}
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
-                  <Row className="mb-4">
-                    <Col md={12}>
-                      <Form.Group>
-                        <Form.Label className="fw-bold text-primary">Degree Level</Form.Label>
-                        <Form.Select size="lg" disabled>
-                          <option>Bachelor's Degree (BA)</option>
-                        </Form.Select>
-                        <Form.Text className="text-muted">Additional degree levels coming soon</Form.Text>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
-                  <div className="text-center">
-                    <Button
-                      variant="secondary"
-                      size="lg"
-                      className="px-4 py-3 d-none d-sm-inline-block"
-                      onClick={handleGenerateReport}
-                      disabled={isLoading || !country1 || !country2}
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-2"></span>
-                          Generating Report...
-                        </>
-                      ) : (
-                        <>
-                          <i className="bi bi-graph-up me-2"></i>
-                          Generate Affinity Report
-                        </>
-                      )}
-                    </Button>
-
-                    <Button
-                      variant="secondary"
-                      size="lg"
-                      className="px-3 py-3 d-sm-none w-100"
-                      onClick={handleGenerateReport}
-                      disabled={isLoading || !country1 || !country2}
-                    >
-                      {isLoading ? (
-                        <>
-                          <span className="spinner-border spinner-border-sm me-2"></span>
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <i className="bi bi-graph-up me-2"></i>
-                          Generate Report
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </Card.Body>
-              </Card>
+              <Alert variant={errorMessage.type || "warning"} onClose={() => setErrorMessage("")} dismissible>
+                {errorMessage.text || errorMessage}
+              </Alert>
             </Col>
           </Row>
+        )}
+        <Row className="text-center mb-5">
+          <Col>
+            <h1 className="display-4 fw-normal text-primary mb-3">
+              Bachelor's Degree <span className="text-secondary">Affinity Report</span>
+            </h1>
+            <p className="lead fw-normal text-muted">
+              Compare international bachelor degree programs and discover academic equivalencies between different education systems worldwide.
+            </p>
+          </Col>
+        </Row>
 
-          {/* Info Section */}
-          <Row className="mt-5">
-            <Col md={4} className="text-center mb-3">
-              <div className="feature-icon mb-3">
-                <i className="bi bi-mortarboard display-4 text-primary"></i>
-              </div>
-              <h4>Academic Equivalency</h4>
-              <p className="text-muted fs-5">Compare degree requirements, credit systems, and academic standards</p>
-            </Col>
-            <Col md={4} className="text-center mb-3">
-              <div className="feature-icon mb-3">
-                <i className="bi bi-globe display-4 text-secondary"></i>
-              </div>
-              <h4>International Standards</h4>
-              <p className="text-muted fs-5">Based on EQF framework and international education benchmarks</p>
-            </Col>
-            <Col md={4} className="text-center mb-3">
-              <div className="feature-icon mb-3">
-                <i className="bi-clipboard-data display-4 fw-normal text-warning"></i>
-              </div>
-              <h4>Detailed Analysis</h4>
-              <p className="text-muted fs-5">Comprehensive degree comparison analysis between countries</p>
-            </Col>
-          </Row>
-        </Container>
-      </div>
+        {/* Comparison Form */}
+        <Row className="justify-content-center">
+          <Col lg={8}>
+            <Card className="shadow-lg border-0">
+              <Card.Body className="p-5">
+                <h3 className="text-center mb-4 text-primary">Compare Degree Programs</h3>
+
+                <Row className="mb-4">
+                  <Col md={5}>
+                    <Form.Group>
+                      <UniversalDropdown
+                        type="countries"
+                        countries={countries}
+                        value={country1}
+                        onChange={(e) => setCountry1(e.target.value)}
+                        placeholder="Select Country"
+                        size="lg"
+                        showSearch={true}
+                        showAllCountries={false}
+                      />
+                    </Form.Group>
+                  </Col>
+
+                  <Col md={2} className="d-flex align-items-center justify-content-center">
+                    <div className="my-2 my-md-0">
+                      <BsArrowLeftRight className="text-secondary" size={32} />
+                    </div>
+                  </Col>
+
+                  <Col md={5}>
+                    <Form.Group>
+                      <UniversalDropdown
+                        type="countries"
+                        countries={countries}
+                        value={country2}
+                        onChange={(e) => setCountry2(e.target.value)}
+                        placeholder="Select Country"
+                        size="lg"
+                        showSearch={true}
+                        showAllCountries={false}
+                      />
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <Row className="mb-4">
+                  <Col md={12}>
+                    <Form.Group>
+                      <Form.Label className="fw-bold text-primary">Degree Level</Form.Label>
+                      <Form.Select size="lg" disabled>
+                        <option>Bachelor's Degree (BA)</option>
+                      </Form.Select>
+                      <Form.Text className="text-muted">Additional degree levels coming soon</Form.Text>
+                    </Form.Group>
+                  </Col>
+                </Row>
+
+                <div className="text-center">
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="px-4 py-3 d-none d-sm-inline-block"
+                    onClick={handleGenerateReport}
+                    disabled={isLoading || !country1 || !country2}
+                  >
+                    {isLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        Generating Report...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-graph-up me-2"></i>
+                        Generate Affinity Report
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="lg"
+                    className="px-3 py-3 d-sm-none w-100"
+                    onClick={handleGenerateReport}
+                    disabled={isLoading || !country1 || !country2}
+                  >
+                    {isLoading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-graph-up me-2"></i>
+                        Generate Report
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Info Section */}
+        <Row className="mt-5">
+          <Col md={4} className="text-center mb-3">
+            <div className="feature-icon mb-3">
+              <i className="bi bi-mortarboard display-4 text-primary"></i>
+            </div>
+            <h4>Academic Equivalency</h4>
+            <p className="text-muted fs-5">Compare degree requirements, credit systems, and academic standards</p>
+          </Col>
+          <Col md={4} className="text-center mb-3">
+            <div className="feature-icon mb-3">
+              <i className="bi bi-globe display-4 text-secondary"></i>
+            </div>
+            <h4>International Standards</h4>
+            <p className="text-muted fs-5">Based on EQF framework and international education benchmarks</p>
+          </Col>
+          <Col md={4} className="text-center mb-3">
+            <div className="feature-icon mb-3">
+              <i className="bi-clipboard-data display-4 fw-normal text-warning"></i>
+            </div>
+            <h4>Detailed Analysis</h4>
+            <p className="text-muted fs-5">Comprehensive degree comparison analysis between countries</p>
+          </Col>
+        </Row>
+      </Container>
     </div>
   );
 };

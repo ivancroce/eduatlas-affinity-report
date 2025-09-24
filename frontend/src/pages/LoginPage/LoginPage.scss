@@ -1,5 +1,9 @@
+.login-page-container {
+  display: flex;
+  align-items: center;
+}
+
 .login-card {
-  background-color: #f2f4f7;
   border-radius: 1rem;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }

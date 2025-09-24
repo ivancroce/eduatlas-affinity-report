@@ -5,8 +5,10 @@ import api from "../../api/axios";
 import { jwtDecode } from "jwt-decode";
 import { BsArrowLeft } from "react-icons/bs";
 import "./LoginPage.scss";
+import { useAvailableHeight } from "../../hooks/useAvailableHeight";
 
 const LoginPage = () => {
+  useAvailableHeight();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -28,14 +30,11 @@ const LoginPage = () => {
     try {
       const response = await api.post("/auth/login", { email, password });
 
-      console.log("Login successful!", response.data);
       const token = response.data.accessToken;
 
       localStorage.setItem("accessToken", token);
 
       const decoded = jwtDecode(token);
-      console.log("Token decoded:", decoded);
-      console.log("User role:", decoded.role);
 
       const userRole = decoded.role;
 
@@ -47,8 +46,6 @@ const LoginPage = () => {
           }
         })
       );
-
-      console.log("Custom event dispatched: userLoggedIn");
 
       if (userRole === "ADMIN") {
         navigate("/admin-dashboard");
@@ -69,47 +66,49 @@ const LoginPage = () => {
   };
 
   return (
-    <Container>
-      <Row className="justify-content-center align-items-center min-h-70vh">
-        <Col md={6} lg={4}>
-          <div className="mb-3">
-            <Button variant="link" className="text-decoration-none p-0 d-flex align-items-center" onClick={() => navigate("/")}>
-              <BsArrowLeft className="me-2" size={20} />
-              Back to Home
-            </Button>
-          </div>
-          <div className="p-4 login-card">
-            <h3 className="text-center mb-4">Login</h3>
-            {error && <Alert variant="danger">{error}</Alert>}
+    <div className="login-page-container full-page-container">
+      <Container>
+        <Row className="justify-content-center align-items-center min-h-70vh">
+          <Col md={6} lg={4}>
+            <div className="mb-3">
+              <Button variant="link" className="text-decoration-none p-0 d-flex align-items-center" onClick={() => navigate("/")}>
+                <BsArrowLeft className="me-2" size={20} />
+                Back to Home
+              </Button>
+            </div>
+            <div className="p-4 login-card bg-light">
+              <h3 className="text-center mb-4">Login</h3>
+              {error && <Alert variant="danger">{error}</Alert>}
 
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label>Email</Form.Label>
-                <Form.Control type="email" placeholder="Enter email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
-              </Form.Group>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3" controlId="formBasicEmail">
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control type="email" placeholder="Enter email" value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
+                </Form.Group>
 
-              <Form.Group className="mb-3" controlId="formBasicPassword">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={isLoading}
-                />
-              </Form.Group>
+                <Form.Group className="mb-3" controlId="formBasicPassword">
+                  <Form.Label>Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                  />
+                </Form.Group>
 
-              <div className="d-grid">
-                <Button variant="secondary" type="submit" disabled={isLoading}>
-                  {isLoading ? "Logging in..." : "Login"}
-                </Button>
-              </div>
-            </Form>
-          </div>
-        </Col>
-      </Row>
-    </Container>
+                <div className="d-grid">
+                  <Button variant="secondary" type="submit" disabled={isLoading}>
+                    {isLoading ? "Logging in..." : "Login"}
+                  </Button>
+                </div>
+              </Form>
+            </div>
+          </Col>
+        </Row>
+      </Container>
+    </div>
   );
 };
 

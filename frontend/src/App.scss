@@ -11,10 +11,8 @@ body {
   background: $bg-blue-gray;
 }
 
-#root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+.full-page-container {
+  min-height: var(--available-height, 100vh);
 }
 
 .w-10 {
@@ -27,10 +25,6 @@ body {
 
 .w-30 {
   width: 30% !important;
-}
-
-.min-h-70vh {
-  min-height: 70vh;
 }
 
 .cursor-pointer {
