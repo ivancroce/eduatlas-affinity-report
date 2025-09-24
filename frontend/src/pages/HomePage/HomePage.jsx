@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import "./HomePage.scss";
 import { BsArrowLeftRight } from "react-icons/bs";
 import UniversalDropdown from "../../components/UniversalDropdown/UniversalDropdown";
 
@@ -88,7 +87,7 @@ const HomePage = () => {
           )}
           <Row className="text-center mb-5">
             <Col>
-              <h1 className="display-4 fw-normal text-primary mb-3 affinity-title">
+              <h1 className="display-4 fw-normal text-primary mb-3">
                 Bachelor's Degree <span className="text-secondary">Affinity Report</span>
               </h1>
               <p className="lead fw-normal text-muted">
