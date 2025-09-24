@@ -1,5 +1,5 @@
 import { Navbar, Container, Image, Button, Nav, NavDropdown, Modal } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BsGear, BsArrowRightSquare, BsHouseDoor, BsExclamationTriangle } from "react-icons/bs";
 import { jwtDecode } from "jwt-decode";
 import { useState, useEffect } from "react";
@@ -11,6 +11,7 @@ import "./MyNavBar.scss";
 
 const MyNavBar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [userRole, setUserRole] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -62,7 +63,7 @@ const MyNavBar = () => {
       window.removeEventListener("storage", handleStorageChange);
       window.removeEventListener("userLoggedIn", handleUserLogin);
     };
-  }, []);
+  }, [location.pathname]);
 
   const handleLogoutClick = () => {
     setShowLogoutModal(true);
@@ -109,9 +110,13 @@ const MyNavBar = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
+              <Nav.Link onClick={() => navigate("/")} className={`d-flex align-items-center ${location.pathname === "/" ? "active" : ""}`}>
+                <BsHouseDoor size={20} className="me-1" />
+                Home
+              </Nav.Link>
               {!userRole ? (
-                <Button variant="outline-light" size="sm" onClick={() => navigate("/login")} title="Admin Login">
-                  <BsGear size={20} className="me-2" />
+                <Button variant="outline-light" size="sm" onClick={() => navigate("/login")} title="Admin Login" className="d-flex align-items-center">
+                  <BsGear size={20} className="me-1" />
                   Login
                 </Button>
               ) : (
@@ -124,11 +129,6 @@ const MyNavBar = () => {
                   }
                   align="end"
                 >
-                  <NavDropdown.Item onClick={() => navigate("/")}>
-                    <BsHouseDoor className="me-2" />
-                    Home
-                  </NavDropdown.Item>
-
                   {userRole === "ADMIN" && (
                     <NavDropdown.Item onClick={() => navigate("/admin-dashboard")}>
                       <BsGear className="me-2" />
