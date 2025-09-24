@@ -1,0 +1,72 @@
+@use "../../styles/variables" as *;
+
+.not-found-container {
+  background: linear-gradient(135deg, $primary 0%, $secondary 50%, $primary 100%);
+  padding: 20px 0;
+}
+
+.not-found-number {
+  font-size: clamp(3rem, 6vw, 6rem);
+  color: $primary;
+  text-shadow: 2px 2px 4px rgba(0, 39, 90, 0.1);
+}
+
+.not-found-title {
+  color: $secondary;
+}
+
+.not-found-badge {
+  background-color: $accent-yellow;
+  color: $primary;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.not-found-icon {
+  width: 80px;
+  height: 80px;
+  background-color: #f8f9fa;
+  border: 3px solid $secondary;
+
+  svg {
+    color: $secondary;
+  }
+}
+
+.not-found-btn-home {
+  background-color: $primary;
+  border-color: $primary;
+
+  &:hover,
+  &:focus {
+    background-color: darken($primary, 8%);
+    border-color: darken($primary, 8%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 39, 90, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+.not-found-btn-back {
+  border-color: $secondary;
+  color: $secondary;
+  background-color: transparent;
+
+  &:hover,
+  &:focus {
+    background-color: $secondary !important;
+    border-color: $secondary !important;
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(20, 108, 168, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0);
+    background-color: darken($secondary, 5%) !important;
+    border-color: darken($secondary, 5%) !important;
+  }
+}
