@@ -238,24 +238,24 @@ const AffinityReportPage = () => {
               <Col lg={8} className="mb-3 mb-lg-0">
                 <div className="border rounded p-3 bg-white h-100">
                   <h6 className="fw-bold mb-3">Report Summary</h6>
-                  <p className="mb-2 report-text">
+                  <p className="mb-3 report-text">
                     <strong>{country1.name}</strong> bachelor's degree ({formatDuration(country1, country1.program.duration)} years,{" "}
                     {country1.program.totalCredits} ECTS) and <strong>{country2.name}</strong> bachelor's degree (
                     {formatDuration(country2, country2.program.duration)} years, {country2.program.totalCredits} ECTS) are both EQF Level{" "}
                     {country1.program.eqfLevel}.
                   </p>
-                  <p className="mb-2 report-text">
+                  <p className="mb-3 report-text">
                     Despite a {Math.abs(country1.program.duration - country2.program.duration)}-year difference at university level, both systems require the
                     same years of education ({country1.yearsCompulsorySchooling}+{country1.program.duration} {country1.name},{" "}
                     {country2.yearsCompulsorySchooling}+{country2.program.duration} {country2.name}), making them broadly equivalent.
                   </p>
-                  <p className="mb-0 text-muted small report-text">
+                  <p className="mb-3 report-text">
                     Credit ratio (1 ECTS = {country1.creditRatio} hours) is {country1.creditRatio === country2.creditRatio ? "identical" : "different"}. Grading
                     systems differ but are convertible. Academic level, workload, and recognition are fully equivalent. Recognition is subject to dual
                     institutional discretion.
                   </p>
                   {(country1.hasSpecialPrograms || country2.hasSpecialPrograms) && (
-                    <div className="mt-3 p-3 bg-info bg-opacity-10 border border-info rounded">
+                    <div className="mt-4 p-3 bg-info bg-opacity-10 border-start border-4 border-info rounded">
                       <BsInfoCircle className="text-info me-2" />
                       <small className="text-muted">
                         <strong>Note:</strong>{" "}
