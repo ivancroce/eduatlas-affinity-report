@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BsArrowLeftRight } from "react-icons/bs";
 import UniversalDropdown from "../../components/UniversalDropdown/UniversalDropdown";
-import { useAvailableHeight } from "../../hooks/useAvailableHeight";
+import StatCounter from "../../components/StatCounter/StatCounter";
+import "./HomePage.scss";
 
 const HomePage = () => {
   const [countries, setCountries] = useState([]);
@@ -13,7 +14,6 @@ const HomePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-  useAvailableHeight();
 
   useEffect(() => {
     fetchCountries();
@@ -74,9 +74,9 @@ const HomePage = () => {
   };
 
   return (
-    <div className="full-page-container">
+    <>
       {/* Hero Section */}
-      <Container className="py-5">
+      <Container className="my-5 py-3">
         {errorMessage && (
           <Row className="justify-content-center mb-4">
             <Col lg={8}>
@@ -201,31 +201,87 @@ const HomePage = () => {
         </Row>
 
         {/* Info Section */}
-        <Row className="mt-5">
-          <Col md={4} className="text-center mb-3">
+        <Row className="mt-5 pt-5 mb-5">
+          <Col className="text-center">
+            <h3 className="text-primary section-title mb-3">Why Choose EduAtlas</h3>
+            <p className="text-muted fs-5">Comprehensive degree comparison powered by international standards</p>
+          </Col>
+        </Row>
+        <Row className="">
+          <Col md={4} className="text-center mb-4">
             <div className="feature-icon mb-3">
               <i className="bi bi-mortarboard display-4 text-primary"></i>
             </div>
-            <h4>Academic Equivalency</h4>
+            <h4 className="text-primary">Academic Equivalency</h4>
             <p className="text-muted fs-5">Compare degree requirements, credit systems, and academic standards</p>
           </Col>
-          <Col md={4} className="text-center mb-3">
+          <Col md={4} className="text-center mb-4">
             <div className="feature-icon mb-3">
               <i className="bi bi-globe display-4 text-secondary"></i>
             </div>
-            <h4>International Standards</h4>
+            <h4 className="text-primary">International Standards</h4>
             <p className="text-muted fs-5">Based on EQF framework and international education benchmarks</p>
           </Col>
-          <Col md={4} className="text-center mb-3">
+          <Col md={4} className="text-center mb-4">
             <div className="feature-icon mb-3">
               <i className="bi-clipboard-data display-4 fw-normal text-warning"></i>
             </div>
-            <h4>Detailed Analysis</h4>
+            <h4 className="text-primary">Detailed Analysis</h4>
             <p className="text-muted fs-5">Comprehensive degree comparison analysis between countries</p>
           </Col>
         </Row>
+        <Row className="text-center">
+          <Col>
+            <i className="bi bi-chevron-double-down text-secondary fs-1 bounce"></i>
+          </Col>
+        </Row>
+
+        {/* Statistics Section */}
+        <Row className="mt-4 pt-4 mb-4 ">
+          <Col className="text-center">
+            <h3 className="text-primary section-title mb-3">Platform Statistics</h3>
+            <p className="text-muted fs-5">Real-time data from our comprehensive education database</p>
+          </Col>
+        </Row>
+        <Row className="pb-5">
+          <Col lg={3} md={6} className="text-center mb-4">
+            <div className="stat-item">
+              <h2 className="display-3 fw-bold text-secondary mb-2">
+                <StatCounter endValue={30} suffix="+" />
+              </h2>
+              <p className="text-muted fw-semibold mb-0">Countries Covered</p>
+            </div>
+          </Col>
+
+          <Col lg={3} md={6} className="text-center mb-4">
+            <div className="stat-item">
+              <h2 className="display-3 fw-bold text-secondary mb-2">
+                <StatCounter endValue={500} suffix="+" />
+              </h2>
+              <p className="text-muted fw-semibold mb-0">Programs Analyzed</p>
+            </div>
+          </Col>
+
+          <Col lg={3} md={6} className="text-center mb-4">
+            <div className="stat-item">
+              <h2 className="display-3 fw-bold text-secondary mb-2">
+                <StatCounter endValue={1000} suffix="+" />
+              </h2>
+              <p className="text-muted fw-semibold mb-0">Reports Generated</p>
+            </div>
+          </Col>
+
+          <Col lg={3} md={6} className="text-center mb-4">
+            <div className="stat-item">
+              <h2 className="display-3 fw-bold text-secondary mb-2">
+                <StatCounter endValue={100} suffix="%" />
+              </h2>
+              <p className="text-muted fw-semibold mb-0">Data Accuracy</p>
+            </div>
+          </Col>
+        </Row>
       </Container>
-    </div>
+    </>
   );
 };
 
