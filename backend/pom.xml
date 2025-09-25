@@ -30,6 +30,18 @@
 		<java.version>21</java.version>
 	</properties>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.konghq/unirest-object-mappers-gson -->
+		<dependency>
+			<groupId>com.konghq</groupId>
+			<artifactId>unirest-object-mappers-gson</artifactId>
+			<version>4.2.9</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.konghq/unirest-java-core -->
+		<dependency>
+			<groupId>com.konghq</groupId>
+			<artifactId>unirest-java-core</artifactId>
+			<version>4.5.0</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
 		<dependency>
 			<groupId>org.springdoc</groupId>

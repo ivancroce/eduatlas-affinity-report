@@ -69,6 +69,10 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
             }
         }
 
+        if (matcher.match("/api/feedback", path) && "POST".equals(method)) {
+            return true;
+        }
+
         // Swagger UI public
         if (matcher.match("/swagger-ui/**", path) ||
                 matcher.match("/api-docs/**", path) ||

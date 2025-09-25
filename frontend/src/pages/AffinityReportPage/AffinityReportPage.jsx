@@ -6,12 +6,16 @@ import CountryFlag from "../../components/CountryFlag/CountryFlag";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { BsInfoCircle } from "react-icons/bs";
+import FeedbackModal from "../../components/FeedbackModal/FeedbackModal";
+import { useState } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const AffinityReportPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+
+  const [showFeedback, setShowFeedback] = useState(false);
 
   const { country1, country2 } = location.state || {};
 
@@ -148,7 +152,7 @@ const AffinityReportPage = () => {
   ];
 
   return (
-    <Container className="my-4">
+    <Container className="my-5">
       {/* Header */}
       <Row className="mb-4">
         <Col>
@@ -326,6 +330,13 @@ const AffinityReportPage = () => {
           <Image src={eduatlasLogo} alt="EduAtlas Logo" className="img-fluid logo-sm" />
         </Col>
       </Row>
+      <div className="mt-4 pt-4 border-top text-center">
+        <Button variant="outline-secondary" size="sm" onClick={() => setShowFeedback(true)}>
+          Report Issue or Give Feedback
+        </Button>
+      </div>
+
+      <FeedbackModal show={showFeedback} onHide={() => setShowFeedback(false)} country1={country1?.name} country2={country2?.name} />
     </Container>
   );
 };
