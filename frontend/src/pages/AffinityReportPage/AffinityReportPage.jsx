@@ -8,6 +8,8 @@ import { Doughnut } from "react-chartjs-2";
 import { BsInfoCircle } from "react-icons/bs";
 import FeedbackModal from "../../components/FeedbackModal/FeedbackModal";
 import { useRef, useState } from "react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -140,6 +142,57 @@ const AffinityReportPage = () => {
     }
   };
 
+  const handleGeneratePDF = async () => {
+    try {
+      const element = reportRef.current;
+
+      const elementsToHide = document.querySelectorAll(".no-print, .d-print-none");
+      elementsToHide.forEach((el) => (el.style.display = "none"));
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        width: element.scrollWidth,
+        height: element.scrollHeight
+      });
+
+      elementsToHide.forEach((el) => (el.style.display = ""));
+
+      const imgData = canvas.toDataURL("image/png");
+
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
+
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+      let position = 0;
+
+      pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const filename = `affinity-report-${country1.name.toLowerCase().replace(/\s+/g, "-")}-vs-${country2.name.toLowerCase().replace(/\s+/g, "-")}.pdf`;
+
+      pdf.save(filename);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Error generating PDF. Please try again.");
+    }
+  };
+
   const durationAffinity = calculateDurationAffinity(country1.program.duration, country2.program.duration);
   const creditsAffinity = calculateCreditsAffinity(country1.program.totalCredits, country2.program.totalCredits);
   const creditRatioAffinity = calculateCreditRatioAffinity(country1.creditRatio, country2.creditRatio);
@@ -216,7 +269,7 @@ const AffinityReportPage = () => {
                 <i className="bi bi-envelope me-1"></i>
                 Share
               </Button>
-              <Button variant="outline-secondary" size="sm">
+              <Button variant="outline-secondary" size="sm" onClick={handleGeneratePDF}>
                 <i className="bi bi-file-earmark-pdf me-1"></i>
                 PDF
               </Button>
