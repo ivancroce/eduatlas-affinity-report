@@ -106,6 +106,40 @@ const AffinityReportPage = () => {
     }, 1000);
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: `Affinity Report: ${country1.name} vs ${country2.name}`,
+      text: `Compare university programs between ${country1.name} and ${country2.name} - EduAtlas`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard! You can now share it.");
+      }
+    } catch (error) {
+      console.log("Share cancelled or failed:", error);
+
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        alert("Link copied to clipboard!");
+      } catch {
+        const textArea = document.createElement("textarea");
+        textArea.value = window.location.href;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textArea);
+        alert("Link copied to clipboard!");
+      }
+    }
+  };
+
   const durationAffinity = calculateDurationAffinity(country1.program.duration, country2.program.duration);
   const creditsAffinity = calculateCreditsAffinity(country1.program.totalCredits, country2.program.totalCredits);
   const creditRatioAffinity = calculateCreditRatioAffinity(country1.creditRatio, country2.creditRatio);
@@ -178,7 +212,7 @@ const AffinityReportPage = () => {
                 <i className="bi bi-printer me-1"></i>
                 Print
               </Button>
-              <Button variant="outline-secondary" size="sm" className="me-0 me-sm-2 mb-2 mb-sm-0">
+              <Button variant="outline-secondary" size="sm" className="me-0 me-sm-2 mb-2 mb-sm-0" onClick={handleShare}>
                 <i className="bi bi-envelope me-1"></i>
                 Share
               </Button>
