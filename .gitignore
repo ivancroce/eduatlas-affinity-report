@@ -117,7 +117,5 @@ Thumbs.db
 *.rar
 
 # Ignore compiled CSS from SCSS
-src/**/*.css
-src/**/*.css.map
-src/components/**/*.css
-src/components/**/*.css.map
+frontend/**/*.css
+frontend/**/*.css.map
