@@ -115,3 +115,9 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+
+# Ignore compiled CSS from SCSS
+src/**/*.css
+src/**/*.css.map
+src/components/**/*.css
+src/components/**/*.css.map
