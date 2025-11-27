@@ -40,19 +40,6 @@ build/
 !.env.example
 .env.properties
 
-### Confidential University Data ###
-# Excel files containing sensitive education data
-*.xlsx
-*.xls
-*.csv
-/src/main/resources/data/
-/backend/src/main/resources/data/
-/data/
-education-data.*
-countries-data.*
-affinity-data.*
-university-data.*
-
 ### Frontend (Node / Vite / React) ###
 # Logs
 logs/
