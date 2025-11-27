@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Modal, Form, Button, Alert } from "react-bootstrap";
 import UniversalDropdown from "../UniversalDropdown/UniversalDropdown";
-import axios from "axios";
+import api from "../../api/axios";
 
 const FeedbackModal = ({ show, onHide, country1, country2 }) => {
   const [feedbackType, setFeedbackType] = useState("");
@@ -25,7 +25,7 @@ const FeedbackModal = ({ show, onHide, country1, country2 }) => {
     setErrorMessage("");
 
     try {
-      await axios.post("http://localhost:3001/api/feedback", {
+      await api.post("/feedback", {
         feedbackType,
         message: message.trim(),
         userEmail: userEmail.trim() || null,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../../src/api/axios";
 import { BsArrowLeftRight } from "react-icons/bs";
 import UniversalDropdown from "../../components/UniversalDropdown/UniversalDropdown";
 import StatCounter from "../../components/StatCounter/StatCounter";
@@ -21,7 +21,7 @@ const HomePage = () => {
 
   const fetchCountries = async () => {
     try {
-      const response = await axios.get("http://localhost:3001/api/countries/simple");
+      const response = await api.get("/countries/simple");
       setCountries(response.data);
     } catch (error) {
       console.error("Error fetching countries:", error);
@@ -43,12 +43,12 @@ const HomePage = () => {
 
     try {
       const [country1Data, country2Data, program1Data, program2Data, special1Data, special2Data] = await Promise.all([
-        axios.get(`http://localhost:3001/api/countries/${country1}`),
-        axios.get(`http://localhost:3001/api/countries/${country2}`),
-        axios.get(`http://localhost:3001/api/countries/${country1}/representative-program`),
-        axios.get(`http://localhost:3001/api/countries/${country2}/representative-program`),
-        axios.get(`http://localhost:3001/api/countries/${country1}/has-special-program`),
-        axios.get(`http://localhost:3001/api/countries/${country2}/has-special-program`)
+        api.get(`/countries/${country1}`),
+        api.get(`/countries/${country2}`),
+        api.get(`/countries/${country1}/representative-program`),
+        api.get(`/countries/${country2}/representative-program`),
+        api.get(`/countries/${country1}/has-special-program`),
+        api.get(`/countries/${country2}/has-special-program`)
       ]);
 
       navigate("/affinity-report", {
