@@ -100,9 +100,9 @@ const MyNavBar = () => {
       <Navbar bg="primary" variant="dark" expand="lg">
         <Container>
           <Navbar.Brand className="navbar-westcliff d-flex align-items-center" onClick={() => navigate("/")}>
-            <Image src={westcliffLogo} height="60" className="me-3 d-none d-sm-inline-block" alt="Westcliff University" />
-            <Image src={westcliffMinLogo} height="60" className="me-3 d-inline-block d-sm-none" alt="Westcliff University" />
-            <Image src={eduAtlasBigLogo} height="40" className="me-3" alt="EduAtlas" />
+            <Image src={westcliffLogo} height="60" width="auto" className="me-3 d-none d-sm-inline-block" alt="Westcliff University" />
+            <Image src={westcliffMinLogo} height="60" width="auto" className="me-3 d-inline-block d-sm-none" alt="Westcliff University" />
+            <Image src={eduAtlasBigLogo} height="40" width="auto" className="me-3" alt="EduAtlas" />
           </Navbar.Brand>
 
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
