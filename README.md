@@ -1,6 +1,6 @@
 # 🎓 EduAtlas - Degree Affinity Report System
 
-![Java](https://img.shields.io/badge/Java-21-orange?style=flat&logo=openjdk) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.2-green?style=flat&logo=springboot) ![React](https://img.shields.io/badge/React-18-blue?style=flat&logo=react) ![Vite](https://img.shields.io/badge/Vite-5.0-646CFF?style=flat&logo=vite&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=flat&logo=postgresql) ![Bootstrap](https://img.shields.io/badge/bootstrap-%238511FA.svg?style=for-the-badge&logo=bootstrap&logoColor=white) ![Sass](https://img.shields.io/badge/Sass-%23CC6699.svg?style=for-the-badge&logo=sass&logoColor=white)![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=flat&logo=swagger&logoColor=black)
+![Java](https://img.shields.io/badge/Java-21-orange?style=flat&logo=openjdk) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.5-green?style=flat&logo=springboot) ![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react) ![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat&logo=vite&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=flat&logo=postgresql) ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=flat&logo=bootstrap&logoColor=white) ![Sass](https://img.shields.io/badge/Sass-1.70.0-CC6699?style=flat&logo=sass&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=flat&logo=swagger&logoColor=black)
 
 The **EduAtlas Affinity Report System** is a Full Stack Capstone project developed for **Westcliff University**. It addresses a specific administrative challenge: comparing international **Bachelor's degree programs** to determine academic compatibility between different education systems.
 
@@ -25,10 +25,12 @@ _(Note: The backend is hosted on a free tier. Please allow ~30 seconds for the s
 
 **1. Country Selection**
 _The homepage features a responsive interface where users select two countries to begin the comparison._
+
 ![Home Selection](frontend/public/assets/images/screenshot-home.png)
 
 **2. Affinity Report Generation**
 _The system generates a detailed comparison table, calculates the affinity score, and visualizes the data._
+
 ![Affinity Report](frontend/public/assets/images/screenshot-report.png)
 
 ---
@@ -37,10 +39,12 @@ _The system generates a detailed comparison table, calculates the affinity score
 
 **3. Secure Authentication**
 _A dedicated `/login` portal protects the administrative area using JWT credentials._
+
 ![Login Screen](frontend/public/assets/images/screenshot-login.png)
 
 **4. Admin Backoffice**
 _Authenticated admins can browse, search, edit, or delete countries data, bachelor programs data and users data via a comprehensive dashboard._
+
 ![Admin Dashboard](frontend/public/assets/images/screenshot-admin.png)
 
 ---
@@ -71,7 +75,7 @@ The source data was provided as a complex, non-standard Excel matrix. **Instead 
 ### Frontend
 
 - **Library:** React 19
-- **Build Tool:** Vite
+- **Build Tool:** Vite 7
 - **Styling:** React Bootstrap 5, SASS
 - **Routing:** React Router
 - **HTTP Client:** Axios
