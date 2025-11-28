@@ -33,6 +33,8 @@ public class CountryController {
     @Autowired
     private BachelorProgramRepository bachelorProgramRepository;
 
+    // --- PUBLIC ENDPOINTS ---
+
     @Operation(summary = "Get a country by ID", description = "Retrieves a single country's details based on its unique identifier.")
     @GetMapping("/{id}")
     public Country getCountryById(@PathVariable Long id) {
@@ -51,18 +53,23 @@ public class CountryController {
         return bachelorProgramService.getRepresentativeProgramForCountry(countryId);
     }
 
+    @Operation(summary = "Get special program", description = "Returns true if the country has a special program, (e.g., alternative program durations available) different from the standard bachelor program.")
     @GetMapping("/{countryId}/has-special-program")
     public ResponseEntity<Boolean> hasSpecialPrograms(@PathVariable Long countryId) {
         boolean hasSpecial = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(countryId);
         return ResponseEntity.ok(hasSpecial);
     }
 
+    // --- ADMIN ENDPOINTS ---
+
+    @Operation(summary = "Get all bachelor programs (Admin)", description = "Retrieves all bachelor programs associated with a specific country.")
     @GetMapping("/{countryId}/bachelor-programs")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<BachelorProgram> getCountryBachelorPrograms(@PathVariable Long countryId) {
         return bachelorProgramService.findByCountryId(countryId);
     }
 
+    @Operation(summary = "Get all countries (Paginated)", description = "Retrieves a paginated list of all countries. Admin only.")
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<Country> getAllCountries(@RequestParam(defaultValue = "0") int page,
@@ -71,6 +78,7 @@ public class CountryController {
         return countryService.findAllCountries(page, size, sortBy);
     }
 
+    @Operation(summary = "Create a new country", description = "Adds a new country and its education details to the database. Admin only.")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -84,6 +92,7 @@ public class CountryController {
         return countryService.save(dto);
     }
 
+    @Operation(summary = "Update a country", description = "Updates details of an existing country. Admin only.")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Country updateCountry(@PathVariable Long id, @RequestBody @Validated CountryRegistrationDTO dto, BindingResult validationResult) {
@@ -97,6 +106,7 @@ public class CountryController {
         return countryService.findCountryByIdAndUpdate(id, dto);
     }
 
+    @Operation(summary = "Delete a country", description = "Removes a country from the system. Admin only.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -104,6 +114,7 @@ public class CountryController {
         countryService.deleteCountry(id);
     }
 
+    @Operation(summary = "Search countries (Admin)", description = "Advanced search for countries by ID or schooling years. Admin only.")
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<Country> searchCountries(
