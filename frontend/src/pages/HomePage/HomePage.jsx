@@ -11,7 +11,8 @@ const HomePage = () => {
   const [countries, setCountries] = useState([]);
   const [country1, setCountry1] = useState("");
   const [country2, setCountry2] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
+  const [isFetchingCountries, setIsFetchingCountries] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
 
@@ -21,10 +22,13 @@ const HomePage = () => {
 
   const fetchCountries = async () => {
     try {
+      setIsFetchingCountries(true);
       const response = await api.get("/countries/simple");
       setCountries(response.data);
     } catch (error) {
       console.error("Error fetching countries:", error);
+    } finally {
+      setIsFetchingCountries(false);
     }
   };
 
@@ -39,7 +43,7 @@ const HomePage = () => {
       return;
     }
 
-    setIsLoading(true);
+    setIsGeneratingReport(true);
 
     try {
       const [country1Data, country2Data, program1Data, program2Data, special1Data, special2Data] = await Promise.all([
@@ -69,7 +73,7 @@ const HomePage = () => {
       console.error("Error generating report:", error);
       setErrorMessage({ type: "danger", text: "Error generating report. Please try again." });
     } finally {
-      setIsLoading(false);
+      setIsGeneratingReport(false);
     }
   };
 
@@ -116,6 +120,7 @@ const HomePage = () => {
                         size="lg"
                         showSearch={true}
                         showAllCountries={false}
+                        loading={isFetchingCountries}
                       />
                     </Form.Group>
                   </Col>
@@ -137,6 +142,7 @@ const HomePage = () => {
                         size="lg"
                         showSearch={true}
                         showAllCountries={false}
+                        loading={isFetchingCountries}
                       />
                     </Form.Group>
                   </Col>
@@ -160,9 +166,9 @@ const HomePage = () => {
                     size="lg"
                     className="px-4 py-3 d-none d-sm-inline-block"
                     onClick={handleGenerateReport}
-                    disabled={isLoading || !country1 || !country2}
+                    disabled={isGeneratingReport || !country1 || !country2}
                   >
-                    {isLoading ? (
+                    {isGeneratingReport ? (
                       <>
                         <span className="spinner-border spinner-border-sm me-2"></span>
                         Generating Report...
@@ -180,9 +186,9 @@ const HomePage = () => {
                     size="lg"
                     className="px-3 py-3 d-sm-none w-100"
                     onClick={handleGenerateReport}
-                    disabled={isLoading || !country1 || !country2}
+                    disabled={isGeneratingReport || !country1 || !country2}
                   >
-                    {isLoading ? (
+                    {isGeneratingReport ? (
                       <>
                         <span className="spinner-border spinner-border-sm me-2"></span>
                         Generating...

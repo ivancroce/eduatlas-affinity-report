@@ -12,7 +12,8 @@ const UniversalDropdown = ({
   size = "sm",
   showAllCountries = false,
   showSearch = true,
-  type = "generic"
+  type = "generic",
+  loading = false
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -73,20 +74,33 @@ const UniversalDropdown = ({
             </Dropdown.Item>
           )}
 
-          {filteredItems.map((item) => (
-            <Dropdown.Item key={item.id || item.value} onClick={() => handleSelect(item.id || item.value)} className="d-flex align-items-center gap-2">
-              {type === "countries" ? (
-                <>
-                  <CountryFlag countryCode={item.countryCode} countryName={item.name} size="16x12" />
-                  {item.name}
-                </>
-              ) : (
-                item.label
-              )}
+          {loading ? (
+            <Dropdown.Item disabled>
+              <div className="d-flex align-items-center gap-2">
+                <div className="spinner-border spinner-border-sm text-primary" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+                <span>Free Tier Server warming up... Please allow ~20s for data.</span>
+              </div>
             </Dropdown.Item>
-          ))}
-
-          {filteredItems.length === 0 && <Dropdown.Item disabled>No options found</Dropdown.Item>}
+          ) : filteredItems.length === 0 && searchTerm === "" ? (
+            <Dropdown.Item disabled>No options available. Please try again later.</Dropdown.Item>
+          ) : filteredItems.length === 0 ? (
+            <Dropdown.Item disabled>No options found.</Dropdown.Item>
+          ) : (
+            filteredItems.map((item) => (
+              <Dropdown.Item key={item.id || item.value} onClick={() => handleSelect(item.id || item.value)} className="d-flex align-items-center gap-2">
+                {type === "countries" ? (
+                  <>
+                    <CountryFlag countryCode={item.countryCode} countryName={item.name} size="16x12" />
+                    {item.name}
+                  </>
+                ) : (
+                  item.label
+                )}
+              </Dropdown.Item>
+            ))
+          )}
         </div>
       </Dropdown.Menu>
     </Dropdown>
