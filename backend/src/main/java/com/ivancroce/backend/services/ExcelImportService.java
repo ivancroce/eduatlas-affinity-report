@@ -4,17 +4,22 @@ import com.ivancroce.backend.entities.BachelorProgram;
 import com.ivancroce.backend.entities.Country;
 import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.repositories.CountryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class ExcelImportService {
     @Autowired
@@ -24,34 +29,41 @@ public class ExcelImportService {
     private BachelorProgramRepository bachelorProgramRepository;
 
 
+    @Transactional
     public void importCountriesFromExcel() throws Exception {
         ClassPathResource resource = new ClassPathResource("data/matrix.xlsx");
 
-        try(Workbook workbook = new XSSFWorkbook(resource.getInputStream())) {
+        try (Workbook workbook = new XSSFWorkbook(resource.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            for (int i = 2; i <= 32; i++) {
+            Set<String> existingNames = countryRepository.findAll()
+                    .stream()
+                    .map(c -> c.getName().toLowerCase())
+                    .collect(Collectors.toSet());
+
+            for (int i = 2; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if(row != null) {
-                    Country country = parseRowToCountry(row);
+                if (row != null) {
+                    Country country = parseRowToCountry(row, existingNames);
                     if (country != null) {
                         Country savedCountry = countryRepository.save(country);
                         createBachelorPrograms(savedCountry, row);
-                        System.out.println("Saved: " + country.getName());
+                        log.info("Saved: {}", country.getName());
+                    }
                 }
             }
         }
-    }}
+    }
 
-    private Country parseRowToCountry(Row row) {
+    private Country parseRowToCountry(Row row, Set<String> existingNames) {
         try {
             // Column A = Country name
             String name = getCellValueAsString(row.getCell(0));
             if (name == null || name.isEmpty()) return null;
 
             // Skip if already exists
-            if (countryRepository.existsByNameIgnoreCase(name)) {
-                System.out.println("Country " + name + " already exists, skipping");
+            if (existingNames.contains(name.toLowerCase())) {
+                log.info("Country {} already exists, skipping", name);
                 return null;
             }
             // Parse all fields from Excel
@@ -60,16 +72,16 @@ public class ExcelImportService {
             String creditRatio = getCellValueAsString(row.getCell(23));
             String countryCode = getCellValueAsString(row.getCell(24));
 
+            if (creditRatio == null || creditRatio.trim().isEmpty()) {
+                creditRatio = "25/30 HOURS OF STUDENT WORK";
+            }
+
             if (name != null && yearsSchooling != null) {
                 return new Country(name, yearsSchooling,
                         gradingSystem, creditRatio, countryCode);
             }
-
-            if (creditRatio == null || creditRatio.trim().isEmpty()) {
-                creditRatio = "25/30 HOURS OF STUDENT WORK";
-            }
         } catch (Exception e) {
-            System.err.println("Error parsing row " + (row.getRowNum() + 1) + ": " + e.getMessage());
+            log.warn("Error parsing row {}: {}", row.getRowNum() + 1, e.getMessage());
         }
         return null;
     }
@@ -93,7 +105,7 @@ public class ExcelImportService {
             }
             return Integer.parseInt(clean);
         } catch (NumberFormatException e) {
-            System.err.println("Could not parse: " + value);
+            log.warn("Could not parse integer from: {}", value);
             return null;
         }
     }

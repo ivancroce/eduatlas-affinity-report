@@ -69,6 +69,11 @@ const AffinityReportPage = () => {
     return { level: "LOW", color: "danger" };
   };
 
+  // Weights: EQUIVALENT contributes 100% to the score; MODERATE contributes 60%
+  // (still meaningful but signals the student would need to demonstrate equivalence); LOW contributes 0.
+  const SCORE_WEIGHT_EQUIVALENT = 100;
+  const SCORE_WEIGHT_MODERATE = 60;
+
   const calculateAffinityPercentage = (affinities) => {
     const comparableAffinities = affinities.filter((affinity) => affinity.level !== "CAN ALWAYS BE CONVERTED" && affinity.level !== "");
 
@@ -76,7 +81,7 @@ const AffinityReportPage = () => {
     const moderateCount = comparableAffinities.filter((a) => a.level === "MODERATE").length;
     const totalCount = comparableAffinities.length;
 
-    const score = (equivalentCount * 100 + moderateCount * 60) / totalCount;
+    const score = (equivalentCount * SCORE_WEIGHT_EQUIVALENT + moderateCount * SCORE_WEIGHT_MODERATE) / totalCount;
     return Math.round(score);
   };
 

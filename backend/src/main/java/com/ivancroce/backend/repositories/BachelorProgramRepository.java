@@ -14,8 +14,8 @@ import java.util.Optional;
 public interface BachelorProgramRepository extends JpaRepository<BachelorProgram, Long>, JpaSpecificationExecutor<BachelorProgram> {
     List<BachelorProgram> findByCountryId(Long countryId);
 
-    @Query("SELECT bp FROM BachelorProgram bp WHERE bp.country.id = :countryId AND bp.duration = (16 - bp.country.yearsCompulsorySchooling) AND bp.isSpecialProgram = false")
-    Optional<BachelorProgram> findStandardProgramForCountry(@Param("countryId") Long countryId);
+    @Query("SELECT bp FROM BachelorProgram bp WHERE bp.country.id = :countryId AND bp.duration = (:totalEducationYears - bp.country.yearsCompulsorySchooling) AND bp.isSpecialProgram = false")
+    Optional<BachelorProgram> findStandardProgramForCountry(@Param("countryId") Long countryId, @Param("totalEducationYears") int totalEducationYears);
 
     @Query("SELECT bp FROM BachelorProgram bp WHERE bp.country.id = :countryId ORDER BY bp.duration DESC LIMIT 1")
     Optional<BachelorProgram> findLongestProgramForCountry(@Param("countryId") Long countryId);
