@@ -22,6 +22,13 @@ import java.util.Optional;
 
 @Service
 public class BachelorProgramService {
+
+    /**
+     * The Bologna Process harmonization constant: a Bachelor's degree is designed to be reachable
+     * after 16 total years of education (primary + secondary + higher). Used to select the
+     * "standard" program duration for a country: standardDuration = 16 - yearsCompulsorySchooling.
+     */
+    public static final int TOTAL_EDUCATION_YEARS = 16;
 @Autowired
     private BachelorProgramRepository bachelorProgramRepository;
 @Autowired
@@ -45,7 +52,7 @@ public BachelorProgram findById(Long id) {
     public BachelorProgram getRepresentativeProgramForCountry(Long countryId) {
         // Try the "standard" program first (16 years)
         Optional<BachelorProgram> standardProgram = bachelorProgramRepository
-                .findStandardProgramForCountry(countryId);
+                .findStandardProgramForCountry(countryId, TOTAL_EDUCATION_YEARS);
 
         if (standardProgram.isPresent()) {
             return standardProgram.get();

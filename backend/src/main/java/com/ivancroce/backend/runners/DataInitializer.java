@@ -8,12 +8,14 @@ import com.ivancroce.backend.payloads.UserRespDTO;
 
 import com.ivancroce.backend.services.ExcelImportService;
 import com.ivancroce.backend.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -39,20 +41,20 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        System.out.println("=== Starting data import... ===");
+        log.info("=== Starting data import... ===");
         excelImportService.importCountriesFromExcel();
-        System.out.println("=== Data import completed! ===");
+        log.info("=== Data import completed! ===");
 
-        System.out.println("=== Checking admin user... ===");
+        log.info("=== Checking admin user... ===");
         User existingAdmin = userService.tryFindByEmail(adminEmail);
         if (existingAdmin == null) {
             UserRegistrationDTO adminDTO = new UserRegistrationDTO(
                     adminUsername, adminEmail, adminPassword, adminFirstName, adminLastName, Role.ADMIN
             );
             UserRespDTO createdAdmin = userService.saveAdmin(adminDTO);
-            System.out.println("=== Admin user created: " + adminUsername + " (ID: " + createdAdmin.userId() + ") ===");
+            log.info("=== Admin user created: {} (ID: {}) ===", adminUsername, createdAdmin.userId());
         } else {
-            System.out.println("=== Admin user already exists ===");
+            log.info("=== Admin user already exists ===");
         }
     }
 }

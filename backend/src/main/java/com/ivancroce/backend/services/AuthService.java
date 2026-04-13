@@ -1,6 +1,7 @@
 package com.ivancroce.backend.services;
 
 import com.ivancroce.backend.entities.User;
+import com.ivancroce.backend.exceptions.NotFoundException;
 import com.ivancroce.backend.exceptions.UnauthorizedException;
 import com.ivancroce.backend.payloads.UserLoginDTO;
 import com.ivancroce.backend.tools.JWTTools;
@@ -20,11 +21,14 @@ public class AuthService {
     private PasswordEncoder bCrypt;
 
     public String checkEmailBeforeLogin(UserLoginDTO payload) {
-        User found = userService.findByEmail(payload.email());
-        if (bCrypt.matches(payload.password(), found.getPassword())) {
-            return jwtTools.createToken(found);
-        } else {
-            throw new UnauthorizedException("Unauthorized - try again");
+        try {
+            User found = userService.findByEmail(payload.email());
+            if (bCrypt.matches(payload.password(), found.getPassword())) {
+                return jwtTools.createToken(found);
+            }
+        } catch (NotFoundException ignored) {
+            // fall through — same response whether email is unknown or password is wrong
         }
+        throw new UnauthorizedException("Invalid email or password");
     }
 }

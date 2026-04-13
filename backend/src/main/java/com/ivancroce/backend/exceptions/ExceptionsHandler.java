@@ -2,6 +2,7 @@ package com.ivancroce.backend.exceptions;
 
 import com.ivancroce.backend.payloads.ErrorDTO;
 import com.ivancroce.backend.payloads.ErrorsWithListDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestControllerAdvice
 public class ExceptionsHandler {
 
@@ -28,7 +30,7 @@ public class ExceptionsHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED) // 401
     public ErrorDTO handleUnauthorized(UnauthorizedException exception) {
-        exception.printStackTrace();
+        log.warn("Unauthorized: {}", exception.getMessage());
         return new ErrorDTO(exception.getMessage(), LocalDateTime.now());
     }
 
@@ -41,14 +43,14 @@ public class ExceptionsHandler {
     @ExceptionHandler(AuthorizationDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN) // 403
     public ErrorDTO handleForbidden(AuthorizationDeniedException exception) {
-        exception.printStackTrace();
+        log.warn("Forbidden: {}", exception.getMessage());
         return new ErrorDTO("Authorization denied", LocalDateTime.now());
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
     public ErrorDTO handleServerError(Exception exception) {
-        exception.printStackTrace();//questo mi stampa in console lo stack trace per capire dove sta l'errore
+        log.error("Unhandled {}: {}", exception.getClass().getSimpleName(), exception.getMessage(), exception);
         return new ErrorDTO("Ooops, we have a problem!", LocalDateTime.now());
     }
 }
