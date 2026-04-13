@@ -18,8 +18,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @Service
 @Slf4j
 public class UserService {

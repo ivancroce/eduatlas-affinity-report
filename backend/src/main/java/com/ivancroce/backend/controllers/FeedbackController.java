@@ -4,7 +4,6 @@ import com.ivancroce.backend.exceptions.ValidationException;
 import com.ivancroce.backend.payloads.FeedbackRequest;
 import com.ivancroce.backend.payloads.FeedbackRespDTO;
 import com.ivancroce.backend.tools.MailgunSender;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
