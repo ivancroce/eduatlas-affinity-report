@@ -245,7 +245,7 @@ public class ExcelImportService {
                 }
 
                 bachelorProgramRepository.save(program);
-                System.out.println("  - Created program: " + duration + " years, " + creditsPerYear + " credits");
+                log.info("  - Created program: {} years, {} credits", duration, creditsPerYear);
             }
         }
     }

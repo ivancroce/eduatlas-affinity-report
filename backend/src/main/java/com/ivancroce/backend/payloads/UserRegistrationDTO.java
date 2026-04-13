@@ -3,7 +3,6 @@ package com.ivancroce.backend.payloads;
 import com.ivancroce.backend.enums.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 public record UserRegistrationDTO(@NotBlank(message = "Username is required.")
