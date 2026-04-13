@@ -62,9 +62,10 @@ public class JWTCheckerFilter extends OncePerRequestFilter {
         // Public endpoints for the Affinity Report
         if ("GET".equals(method)) {
             if (matcher.match("/api/countries/simple", path) ||
+                    matcher.match("/api/countries/comparison", path) ||
                     matcher.match("/api/countries/*/representative-program", path) ||
                     matcher.match("/api/countries/*/has-special-program", path) ||
-                    matcher.match("/api/countries/*", path) && !path.contains("/search")) {
+                    (matcher.match("/api/countries/*", path) && !path.contains("/search"))) {
                 return true;
             }
         }
