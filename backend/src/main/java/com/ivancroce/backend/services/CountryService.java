@@ -29,6 +29,11 @@ public class CountryService {
                 .orElseThrow(() -> new NotFoundException("Country not found with id: " + id));
     }
 
+    public Country findByCountryCode(String code) {
+        return countryRepository.findByCountryCodeIgnoreCase(code)
+                .orElseThrow(() -> new NotFoundException("Country not found with code: " + code));
+    }
+
     public Page<Country> findAllCountries(int page, int size, String sortBy) {
         if (size > 50) size = 50;
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortBy).ascending());
