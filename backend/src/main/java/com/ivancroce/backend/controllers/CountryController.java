@@ -11,7 +11,7 @@ import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.services.BachelorProgramService;
 import com.ivancroce.backend.services.CountryService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -39,21 +39,21 @@ public class CountryController {
 
     // --- PUBLIC ENDPOINTS ---
 
-    @Operation(summary = "Get comparison data for two countries", description = "Returns both countries, their representative programs, and special-program flags in a single response. Replaces the previous 6-call pattern.")
+    @Operation(summary = "Get comparison data for two countries", description = "Returns both countries, their representative programs, and special-program flags in a single response. Accepts ISO 2-letter country codes (e.g. c1=IT&c2=IE).")
     @GetMapping("/comparison")
     public CountryComparisonRespDTO getComparison(
-            @RequestParam @Positive Long country1Id,
-            @RequestParam @Positive Long country2Id) {
-        if (country1Id.equals(country2Id)) {
+            @RequestParam @NotBlank String c1,
+            @RequestParam @NotBlank String c2) {
+        if (c1.equalsIgnoreCase(c2)) {
             throw new BadRequestException("Cannot compare a country with itself");
         }
-        Country c1 = countryService.findById(country1Id);
-        Country c2 = countryService.findById(country2Id);
-        BachelorProgram p1 = bachelorProgramService.getRepresentativeProgramForCountry(country1Id);
-        BachelorProgram p2 = bachelorProgramService.getRepresentativeProgramForCountry(country2Id);
-        boolean s1 = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(country1Id);
-        boolean s2 = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(country2Id);
-        return new CountryComparisonRespDTO(c1, p1, s1, c2, p2, s2);
+        Country country1 = countryService.findByCountryCode(c1);
+        Country country2 = countryService.findByCountryCode(c2);
+        BachelorProgram p1 = bachelorProgramService.getRepresentativeProgramForCountry(country1.getId());
+        BachelorProgram p2 = bachelorProgramService.getRepresentativeProgramForCountry(country2.getId());
+        boolean s1 = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(country1.getId());
+        boolean s2 = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(country2.getId());
+        return new CountryComparisonRespDTO(country1, p1, s1, country2, p2, s2);
     }
 
     @Operation(summary = "Get a country by ID", description = "Retrieves a single country's details based on its unique identifier.")
