@@ -1,0 +1,33 @@
+@use "../../styles/variables" as *;
+
+.grade-comparison-page {
+  .country-header-row {
+    .country-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+  }
+
+  .grade-table {
+    thead th {
+      background-color: $bg-blue-gray;
+      vertical-align: middle;
+
+      .grade-letter {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: $primary;
+      }
+    }
+
+    .country-name-cell {
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .fail-cell {
+      color: #dc3545;
+    }
+  }
+}

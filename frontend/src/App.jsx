@@ -8,6 +8,7 @@ import AdminDashboard from "./pages/AdminDashboard/AdminDashboard";
 import StudentDashboard from "./pages/StudentDashboard/StudentDashboard";
 import HomePage from "./pages/HomePage/HomePage";
 import AffinityReportPage from "./pages/AffinityReportPage/AffinityReportPage";
+import GradeComparisonPage from "./pages/GradeComparisonPage/GradeComparisonPage";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/affinity-report" element={<AffinityReportPage />} />
+        <Route path="/grade-comparison" element={<GradeComparisonPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/admin-dashboard"
