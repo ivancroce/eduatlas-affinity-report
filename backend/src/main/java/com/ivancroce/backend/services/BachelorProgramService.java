@@ -8,7 +8,7 @@ import com.ivancroce.backend.payloads.BachelorRegistrationDTO;
 import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.repositories.CountryRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +21,7 @@ import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class BachelorProgramService {
 
     /**
@@ -29,12 +30,11 @@ public class BachelorProgramService {
      * "standard" program duration for a country: standardDuration = 16 - yearsCompulsorySchooling.
      */
     public static final int TOTAL_EDUCATION_YEARS = 16;
-@Autowired
-    private BachelorProgramRepository bachelorProgramRepository;
-@Autowired
-    private CountryRepository countryRepository;
 
-public BachelorProgram findById(Long id) {
+    private final BachelorProgramRepository bachelorProgramRepository;
+    private final CountryRepository countryRepository;
+
+    public BachelorProgram findById(Long id) {
     return bachelorProgramRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Bachelor program not found with id: " + id));
 }

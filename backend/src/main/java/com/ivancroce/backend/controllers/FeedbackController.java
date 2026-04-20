@@ -4,7 +4,7 @@ import com.ivancroce.backend.exceptions.ValidationException;
 import com.ivancroce.backend.payloads.FeedbackRequest;
 import com.ivancroce.backend.payloads.FeedbackRespDTO;
 import com.ivancroce.backend.tools.MailgunSender;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -16,9 +16,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/feedback")
 @ResponseStatus(HttpStatus.OK)
+@RequiredArgsConstructor
 public class FeedbackController {
-    @Autowired
-    private MailgunSender mailgunSender;
+    private final MailgunSender mailgunSender;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)

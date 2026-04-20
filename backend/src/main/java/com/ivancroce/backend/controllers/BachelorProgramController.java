@@ -5,7 +5,7 @@ import com.ivancroce.backend.exceptions.ValidationException;
 import com.ivancroce.backend.payloads.BachelorRegistrationDTO;
 import com.ivancroce.backend.services.BachelorProgramService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,10 +17,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bachelor-programs")
+@RequiredArgsConstructor
 public class BachelorProgramController {
 
-    @Autowired
-    private BachelorProgramService bachelorProgramService;
+    private final BachelorProgramService bachelorProgramService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")

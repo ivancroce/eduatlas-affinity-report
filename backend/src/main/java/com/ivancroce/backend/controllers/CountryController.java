@@ -12,7 +12,7 @@ import com.ivancroce.backend.services.BachelorProgramService;
 import com.ivancroce.backend.services.CountryService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.constraints.NotBlank;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,16 +26,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/countries")
 @Validated
+@RequiredArgsConstructor
 public class CountryController {
 
-    @Autowired
-    private CountryService countryService;
-
-    @Autowired
-    private BachelorProgramService bachelorProgramService;
-
-    @Autowired
-    private BachelorProgramRepository bachelorProgramRepository;
+    private final CountryService countryService;
+    private final BachelorProgramService bachelorProgramService;
+    private final BachelorProgramRepository bachelorProgramRepository;
 
     // --- PUBLIC ENDPOINTS ---
 

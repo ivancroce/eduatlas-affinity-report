@@ -4,7 +4,7 @@ import com.ivancroce.backend.payloads.UserLoginDTO;
 import com.ivancroce.backend.payloads.UserLoginRespDTO;
 import com.ivancroce.backend.services.AuthService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public UserLoginRespDTO login(@Valid @RequestBody UserLoginDTO loginDTO) {
