@@ -7,7 +7,7 @@ import com.ivancroce.backend.repositories.CountryRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,12 +21,10 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ExcelImportService {
-    @Autowired
-    private CountryRepository countryRepository;
-
-    @Autowired
-    private BachelorProgramRepository bachelorProgramRepository;
+    private final CountryRepository countryRepository;
+    private final BachelorProgramRepository bachelorProgramRepository;
 
 
     @Transactional

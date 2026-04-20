@@ -8,7 +8,7 @@ import com.ivancroce.backend.payloads.CountryRegistrationDTO;
 import com.ivancroce.backend.payloads.CountryRespDTO;
 import com.ivancroce.backend.repositories.CountryRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CountryService {
 
-    @Autowired
-    private CountryRepository countryRepository;
+    private final CountryRepository countryRepository;
 
     public Country findById(Long id) {
         return countryRepository.findById(id)

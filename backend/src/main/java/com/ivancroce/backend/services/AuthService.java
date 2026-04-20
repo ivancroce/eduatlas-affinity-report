@@ -5,20 +5,16 @@ import com.ivancroce.backend.exceptions.NotFoundException;
 import com.ivancroce.backend.exceptions.UnauthorizedException;
 import com.ivancroce.backend.payloads.UserLoginDTO;
 import com.ivancroce.backend.tools.JWTTools;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JWTTools jwtTools;
-
-    @Autowired
-    private PasswordEncoder bCrypt;
+    private final UserService userService;
+    private final JWTTools jwtTools;
+    private final PasswordEncoder bCrypt;
 
     public String checkEmailBeforeLogin(UserLoginDTO payload) {
         try {

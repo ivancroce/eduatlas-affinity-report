@@ -7,7 +7,7 @@ import com.ivancroce.backend.payloads.UserRegistrationDTO;
 import com.ivancroce.backend.payloads.UserRespDTO;
 import com.ivancroce.backend.payloads.UserUpdateDTO;
 import com.ivancroce.backend.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,9 +20,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
