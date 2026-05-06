@@ -3,7 +3,9 @@ package com.ivancroce.backend.controllers;
 import com.ivancroce.backend.exceptions.ValidationException;
 import com.ivancroce.backend.payloads.FeedbackRequest;
 import com.ivancroce.backend.payloads.FeedbackRespDTO;
+import com.ivancroce.backend.services.FeedbackRateLimiter;
 import com.ivancroce.backend.tools.MailgunSender;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -19,16 +21,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FeedbackController {
     private final MailgunSender mailgunSender;
+    private final FeedbackRateLimiter rateLimiter;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public FeedbackRespDTO submitFeedback(@Validated @RequestBody FeedbackRequest request, BindingResult validationResult) {
+    public FeedbackRespDTO submitFeedback(@Validated @RequestBody FeedbackRequest request,
+                                          BindingResult validationResult,
+                                          HttpServletRequest httpRequest) {
         if (validationResult.hasErrors()) {
             List<String> errors = validationResult.getFieldErrors().stream()
                     .map(fieldError -> fieldError.getDefaultMessage())
                     .toList();
             throw new ValidationException(errors);
         }
+        String ip = rateLimiter.extractIp(httpRequest);
+        rateLimiter.checkAllowed(ip);
         mailgunSender.sendFeedbackEmail(
                 request.feedbackType(),
                 request.message(),
