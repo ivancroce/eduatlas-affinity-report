@@ -11,6 +11,10 @@ import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.services.BachelorProgramService;
 import com.ivancroce.backend.services.CountryService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,6 +31,7 @@ import java.util.List;
 @RequestMapping("/api/countries")
 @Validated
 @RequiredArgsConstructor
+@Tag(name = "Countries", description = "Country data, comparison, and admin management endpoints")
 public class CountryController {
 
     private final CountryService countryService;
@@ -36,6 +41,12 @@ public class CountryController {
     // --- PUBLIC ENDPOINTS ---
 
     @Operation(summary = "Get comparison data for two countries", description = "Returns both countries, their representative programs, and special-program flags in a single response. Accepts ISO 2-letter country codes (e.g. c1=IT&c2=IE).")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Comparison data returned"),
+            @ApiResponse(responseCode = "400", description = "Same country code supplied for both params, or missing param"),
+            @ApiResponse(responseCode = "404", description = "One or both country codes not found")
+    })
+    @SecurityRequirements({})
     @GetMapping("/comparison")
     public CountryComparisonRespDTO getComparison(
             @RequestParam @NotBlank String c1,
@@ -53,24 +64,38 @@ public class CountryController {
     }
 
     @Operation(summary = "Get a country by ID", description = "Retrieves a single country's details based on its unique identifier.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Country found"),
+            @ApiResponse(responseCode = "404", description = "Country not found")
+    })
+    @SecurityRequirements({})
     @GetMapping("/{id}")
     public Country getCountryById(@PathVariable Long id) {
         return countryService.findById(id);
     }
 
     @Operation(summary = "Get simple countries list", description = "Returns list of countries for dropdown selection")
+    @ApiResponse(responseCode = "200", description = "List of countries returned")
+    @SecurityRequirements({})
     @GetMapping("/simple")
     public List<CountryRespDTO> getAllCountriesSimple() {
         return countryService.findAllCountriesSimple();
     }
 
     @Operation(summary = "Get representative program", description = "Get the standard bachelor program for affinity comparison")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Representative program returned"),
+            @ApiResponse(responseCode = "404", description = "Country not found")
+    })
+    @SecurityRequirements({})
     @GetMapping("/{countryId}/representative-program")
     public BachelorProgram getRepresentativeProgram(@PathVariable Long countryId) {
         return bachelorProgramService.getRepresentativeProgramForCountry(countryId);
     }
 
-    @Operation(summary = "Get special program", description = "Returns true if the country has a special program, (e.g., alternative program durations available) different from the standard bachelor program.")
+    @Operation(summary = "Check for special program", description = "Returns true if the country has a special program, (e.g., alternative program durations available) different from the standard bachelor program.")
+    @ApiResponse(responseCode = "200", description = "Boolean flag returned")
+    @SecurityRequirements({})
     @GetMapping("/{countryId}/has-special-program")
     public ResponseEntity<Boolean> hasSpecialPrograms(@PathVariable Long countryId) {
         boolean hasSpecial = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(countryId);
@@ -79,14 +104,22 @@ public class CountryController {
 
     // --- ADMIN ENDPOINTS ---
 
-    @Operation(summary = "Get all bachelor programs (Admin)", description = "Retrieves all bachelor programs associated with a specific country.")
+    @Operation(summary = "Get all bachelor programs for a country (Admin)", description = "Retrieves all bachelor programs associated with a specific country.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Programs returned"),
+            @ApiResponse(responseCode = "403", description = "Access denied — Admin only")
+    })
     @GetMapping("/{countryId}/bachelor-programs")
     @PreAuthorize("hasAuthority('ADMIN')")
     public List<BachelorProgram> getCountryBachelorPrograms(@PathVariable Long countryId) {
         return bachelorProgramService.findByCountryId(countryId);
     }
 
-    @Operation(summary = "Get all countries (Paginated)", description = "Retrieves a paginated list of all countries. Admin only.")
+    @Operation(summary = "Get all countries paginated (Admin)", description = "Retrieves a paginated list of all countries. Admin only.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Paginated country list returned"),
+            @ApiResponse(responseCode = "403", description = "Access denied — Admin only")
+    })
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<Country> getAllCountries(@RequestParam(defaultValue = "0") int page,
@@ -95,7 +128,12 @@ public class CountryController {
         return countryService.findAllCountries(page, size, sortBy);
     }
 
-    @Operation(summary = "Create a new country", description = "Adds a new country and its education details to the database. Admin only.")
+    @Operation(summary = "Create a new country (Admin)", description = "Adds a new country and its education details to the database. Admin only.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Country created"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "403", description = "Access denied — Admin only")
+    })
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -109,7 +147,13 @@ public class CountryController {
         return countryService.save(dto);
     }
 
-    @Operation(summary = "Update a country", description = "Updates details of an existing country. Admin only.")
+    @Operation(summary = "Update a country (Admin)", description = "Updates details of an existing country. Admin only.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Country updated"),
+            @ApiResponse(responseCode = "400", description = "Validation error"),
+            @ApiResponse(responseCode = "403", description = "Access denied — Admin only"),
+            @ApiResponse(responseCode = "404", description = "Country not found")
+    })
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Country updateCountry(@PathVariable Long id, @RequestBody @Validated CountryRegistrationDTO dto, BindingResult validationResult) {
@@ -123,7 +167,12 @@ public class CountryController {
         return countryService.findCountryByIdAndUpdate(id, dto);
     }
 
-    @Operation(summary = "Delete a country", description = "Removes a country from the system. Admin only.")
+    @Operation(summary = "Delete a country (Admin)", description = "Removes a country from the system. Admin only.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Country deleted"),
+            @ApiResponse(responseCode = "403", description = "Access denied — Admin only"),
+            @ApiResponse(responseCode = "404", description = "Country not found")
+    })
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAuthority('ADMIN')")
@@ -132,6 +181,10 @@ public class CountryController {
     }
 
     @Operation(summary = "Search countries (Admin)", description = "Advanced search for countries by ID or schooling years. Admin only.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Search results returned"),
+            @ApiResponse(responseCode = "403", description = "Access denied — Admin only")
+    })
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('ADMIN')")
     public Page<Country> searchCountries(

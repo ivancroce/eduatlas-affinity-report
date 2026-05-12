@@ -59,6 +59,7 @@ dist-ssr/
 
 # Local overrides
 *.local
+CLAUDE.local.md
 
 # Environment variables
 .env.local
