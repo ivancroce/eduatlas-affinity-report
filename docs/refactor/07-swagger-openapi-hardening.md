@@ -285,6 +285,29 @@ The implementing agent must run all of these locally before asking the user to t
 
 ---
 
+## Automated tests
+
+The JWT filter whitelist introduced across all sprints is verified as security regression tests in `CountryControllerTest` (`backend/src/test/java/com/ivancroce/backend/controllers/CountryControllerTest.java`):
+
+| Test | What it verifies |
+|---|---|
+| `getAllCountries_withoutAuthToken_returns401` | `GET /api/countries` without an `Authorization` header → 401 (filter runs on admin endpoints) |
+| `getCountriesSimple_withoutAuthToken_returns200` | `GET /api/countries/simple` without an `Authorization` header → 200 (filter bypassed for public endpoints) |
+
+These tests confirm `JWTCheckerFilter.shouldNotFilter()` correctly gates admin endpoints and passes through public ones. If the whitelist is accidentally broken in a future change, these tests will catch it.
+
+`AuthControllerTest` (`backend/src/test/java/com/ivancroce/backend/controllers/AuthControllerTest.java`) further verifies the `ExceptionsHandler` integration:
+
+| Test | What it verifies |
+|---|---|
+| `login_validCredentials_returns200WithToken` | Valid credentials → 200 with `accessToken` in body |
+| `login_invalidCredentials_returns401` | `UnauthorizedException` from service → 401 via `ExceptionsHandler` |
+| `login_emptyBody_returns400` | Empty `{}` body → 400 via `MethodArgumentNotValidException` handler |
+
+Run: `./mvnw.cmd test -Dtest="CountryControllerTest,AuthControllerTest"` (from `backend/`)
+
+---
+
 ## Acceptance criteria (one-line summary for the user)
 
 After this branch is merged, a developer can open Swagger UI in production, call `POST /api/auth/login`, paste the returned token into the Authorize dialog, and successfully invoke any admin endpoint — and both the `public` and `admin` group filters work without 500ing.

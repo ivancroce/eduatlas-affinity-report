@@ -293,3 +293,27 @@ The affinity algorithm (`calculateGradingAffinity`) and scoring logic are not ch
 5. For a country not in `gradingScales.js`, confirm "N/A" renders without crashing
 6. Click "← go back" → returns to the affinity report page with the same URL params
 7. Test with country names containing spaces (e.g. "United Kingdom") — URL encoding must not break routing
+
+---
+
+## Automated tests
+
+This sprint's changes are covered by two test classes.
+
+**`BachelorProgramServiceTest`** (`backend/src/test/java/com/ivancroce/backend/services/BachelorProgramServiceTest.java`):
+
+| Test | What it verifies |
+|---|---|
+| `standardProgramFound_returnsIt` | Standard program (duration = 16 − yearsCompulsorySchooling, non-special) is returned when it exists |
+| `standardProgramAbsent_fallsBackToLongest` | When no standard program matches, the longest program for the country is returned (handles e.g. Poland's 3.5-year degree) |
+| `noProgramsFound_throwsNotFoundException` | When no programs exist at all, `NotFoundException` is thrown |
+
+**`CountryControllerTest`** (`backend/src/test/java/com/ivancroce/backend/controllers/CountryControllerTest.java`) — covers the comparison endpoint:
+
+| Test | What it verifies |
+|---|---|
+| `comparison_validDifferentCodes_returns200` | `GET /api/countries/comparison?c1=IT&c2=IE` → 200 |
+| `comparison_sameCode_returns400` | Same country code in both params → 400 (controller guard) |
+| `comparison_missingC1Param_returns400` | Missing required `c1` parameter → 400 (`MissingServletRequestParameterException` handler) |
+
+Run: `./mvnw.cmd test -Dtest="BachelorProgramServiceTest,CountryControllerTest"` (from `backend/`)

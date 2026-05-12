@@ -327,7 +327,7 @@ setErrorMessage(error.response.data?.message || "Too many requests.");
 
 ## Verification checklist
 
-- [x] `./mvnw test` passes — 11 tests (1 smoke + 10 unit), 0 failures
+- [x] `./mvnw test` passes — 28 tests, 0 failures (10 `FeedbackRateLimiterTest` + 4 `AuthServiceTest` + 3 `BachelorProgramServiceTest` + 2 `CountryServiceTest` + 5 `CountryControllerTest` + 3 `AuthControllerTest` + 1 smoke)
 - [ ] App boots without errors
 - [ ] Single feedback submission returns 200 and email arrives in inbox
 - [ ] 4th submission from the same IP within the 1-minute window returns 429

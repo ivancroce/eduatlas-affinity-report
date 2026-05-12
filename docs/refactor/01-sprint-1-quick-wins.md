@@ -267,3 +267,18 @@ These are deliberately scoped to separate branches with their own documentation.
 1. Start the frontend: `npm run dev` (from `frontend/`)
 2. Select two countries and generate a report — verify the score and layout are unchanged
 3. The score formula change is a rename only; if the report renders, the logic is correct
+
+---
+
+## Automated tests
+
+The user enumeration fix is covered by `AuthServiceTest` (`backend/src/test/java/com/ivancroce/backend/services/AuthServiceTest.java`):
+
+| Test | What it verifies |
+|---|---|
+| `validCredentials_returnsToken` | Correct email + password returns a JWT |
+| `wrongPassword_throwsUnauthorizedException` | Real email, wrong password → `UnauthorizedException` |
+| `unknownEmail_throwsUnauthorizedException` | Unknown email → `UnauthorizedException` (not 404) |
+| `userEnumeration_wrongPasswordAndUnknownEmail_throwSameMessage` | Both failure paths produce the same exception message — an attacker cannot tell whether the email exists |
+
+Run: `./mvnw.cmd test -Dtest=AuthServiceTest` (from `backend/`)
