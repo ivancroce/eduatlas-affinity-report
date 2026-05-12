@@ -17,6 +17,8 @@ The system automates the analysis of degree durations, ECTS credits, credit rati
 
 _(Note: The backend is hosted on a free tier. Please allow ~30 seconds for the server to wake up on the first request.)_
 
+> **API Docs note:** Swagger exposes both public and admin endpoints for portfolio review purposes. In a production system, the admin group would be restricted or disabled via `springdoc.swagger-ui.enabled=false`.
+
 ---
 
 ## 📸 Application Gallery

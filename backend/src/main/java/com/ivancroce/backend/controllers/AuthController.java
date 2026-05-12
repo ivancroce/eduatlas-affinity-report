@@ -6,6 +6,7 @@ import com.ivancroce.backend.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class AuthController {
             @ApiResponse(responseCode = "400", description = "Validation error on request body"),
             @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
+    @SecurityRequirements({})
     @PostMapping("/login")
     public UserLoginRespDTO login(@Valid @RequestBody UserLoginDTO loginDTO) {
         String token = authService.checkEmailBeforeLogin(loginDTO);

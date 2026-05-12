@@ -8,6 +8,7 @@ import com.ivancroce.backend.tools.MailgunSender;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class FeedbackController {
             @ApiResponse(responseCode = "400", description = "Validation error on request body"),
             @ApiResponse(responseCode = "429", description = "Rate limit exceeded — check Retry-After header")
     })
+    @SecurityRequirements({})
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public FeedbackRespDTO submitFeedback(@Validated @RequestBody FeedbackRequest request,

@@ -13,6 +13,7 @@ import com.ivancroce.backend.services.CountryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class CountryController {
             @ApiResponse(responseCode = "400", description = "Same country code supplied for both params, or missing param"),
             @ApiResponse(responseCode = "404", description = "One or both country codes not found")
     })
+    @SecurityRequirements({})
     @GetMapping("/comparison")
     public CountryComparisonRespDTO getComparison(
             @RequestParam @NotBlank String c1,
@@ -66,6 +68,7 @@ public class CountryController {
             @ApiResponse(responseCode = "200", description = "Country found"),
             @ApiResponse(responseCode = "404", description = "Country not found")
     })
+    @SecurityRequirements({})
     @GetMapping("/{id}")
     public Country getCountryById(@PathVariable Long id) {
         return countryService.findById(id);
@@ -73,6 +76,7 @@ public class CountryController {
 
     @Operation(summary = "Get simple countries list", description = "Returns list of countries for dropdown selection")
     @ApiResponse(responseCode = "200", description = "List of countries returned")
+    @SecurityRequirements({})
     @GetMapping("/simple")
     public List<CountryRespDTO> getAllCountriesSimple() {
         return countryService.findAllCountriesSimple();
@@ -83,6 +87,7 @@ public class CountryController {
             @ApiResponse(responseCode = "200", description = "Representative program returned"),
             @ApiResponse(responseCode = "404", description = "Country not found")
     })
+    @SecurityRequirements({})
     @GetMapping("/{countryId}/representative-program")
     public BachelorProgram getRepresentativeProgram(@PathVariable Long countryId) {
         return bachelorProgramService.getRepresentativeProgramForCountry(countryId);
@@ -90,6 +95,7 @@ public class CountryController {
 
     @Operation(summary = "Check for special program", description = "Returns true if the country has a special program, (e.g., alternative program durations available) different from the standard bachelor program.")
     @ApiResponse(responseCode = "200", description = "Boolean flag returned")
+    @SecurityRequirements({})
     @GetMapping("/{countryId}/has-special-program")
     public ResponseEntity<Boolean> hasSpecialPrograms(@PathVariable Long countryId) {
         boolean hasSpecial = bachelorProgramRepository.existsByCountryIdAndIsSpecialProgramTrue(countryId);
