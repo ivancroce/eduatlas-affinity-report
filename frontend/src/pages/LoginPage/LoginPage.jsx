@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Form, Button, Container, Row, Col, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import api from "../../api/axios";
-import { jwtDecode } from "jwt-decode";
+import { useAuth } from "../../context/AuthContext";
 import "./LoginPage.scss";
 import { useAvailableHeight } from "../../hooks/useAvailableHeight";
 
@@ -14,6 +14,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,24 +30,9 @@ const LoginPage = () => {
     try {
       const response = await api.post("/auth/login", { email, password });
 
-      const token = response.data.accessToken;
+      const user = login(response.data.accessToken);
 
-      localStorage.setItem("accessToken", token);
-
-      const decoded = jwtDecode(token);
-
-      const userRole = decoded.role;
-
-      window.dispatchEvent(
-        new CustomEvent("userLoggedIn", {
-          detail: {
-            role: userRole,
-            userId: decoded.sub
-          }
-        })
-      );
-
-      if (userRole === "ADMIN") {
+      if (user?.role === "ADMIN") {
         navigate("/admin-dashboard");
       } else {
         navigate("/student-dashboard");

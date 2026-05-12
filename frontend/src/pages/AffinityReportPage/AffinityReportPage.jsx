@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Container, Row, Col, Card, Table, Button, Badge, Alert, Image } from "react-bootstrap";
 import eduatlasLogo from "../../../assets/images/eduatlas-logo.png";
 import "./AffinityReportPage.scss";
@@ -7,22 +7,62 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import { BsInfoCircle } from "react-icons/bs";
 import FeedbackModal from "../../components/FeedbackModal/FeedbackModal";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import api from "../../api/axios";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const AffinityReportPage = () => {
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const reportRef = useRef();
 
   const [showFeedback, setShowFeedback] = useState(false);
+  const [country1, setCountry1] = useState(null);
+  const [country2, setCountry2] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
-  const { country1, country2 } = location.state || {};
+  useEffect(() => {
+    const c1 = searchParams.get("c1");
+    const c2 = searchParams.get("c2");
 
-  if (!country1 || !country2) {
+    if (!c1 || !c2) {
+      setFetchError(true);
+      setIsLoading(false);
+      return;
+    }
+
+    const fetchComparison = async () => {
+      try {
+        const response = await api.get(`/countries/comparison?c1=${c1}&c2=${c2}`);
+        const data = response.data;
+        setCountry1({ ...data.country1, program: data.representativeProgram1, hasSpecialPrograms: data.hasSpecialProgram1 });
+        setCountry2({ ...data.country2, program: data.representativeProgram2, hasSpecialPrograms: data.hasSpecialProgram2 });
+      } catch (error) {
+        console.error("Error fetching comparison data:", error);
+        setFetchError(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchComparison();
+  }, [searchParams]);
+
+  if (isLoading) {
+    return (
+      <Container className="mt-5 text-center">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </Container>
+    );
+  }
+
+  if (fetchError || !country1 || !country2) {
     return (
       <Container className="mt-5">
         <Alert variant="warning" className="text-center">
@@ -57,9 +97,8 @@ const AffinityReportPage = () => {
     return { level: "MODERATE", color: "warning" };
   };
 
-  // It always return CAN ALWAYS BE CONVERTED at the moment
   const calculateGradingAffinity = () => {
-    return { level: "CAN ALWAYS BE CONVERTED", color: "warning" };
+    return { level: "COMPARE GRADING SCALES →", color: "primary" };
   };
 
   const calculateEqfAffinity = (eqf1, eqf2) => {
@@ -69,28 +108,29 @@ const AffinityReportPage = () => {
     return { level: "LOW", color: "danger" };
   };
 
+  // Weights: EQUIVALENT contributes 100% to the score; MODERATE contributes 60%
+  // (still meaningful but signals the student would need to demonstrate equivalence); LOW contributes 0.
+  const SCORE_WEIGHT_EQUIVALENT = 100;
+  const SCORE_WEIGHT_MODERATE = 60;
+
   const calculateAffinityPercentage = (affinities) => {
-    const comparableAffinities = affinities.filter((affinity) => affinity.level !== "CAN ALWAYS BE CONVERTED" && affinity.level !== "");
+    const equivalentCount = affinities.filter((a) => a.level === "EQUIVALENT").length;
+    const moderateCount = affinities.filter((a) => a.level === "MODERATE").length;
+    const totalCount = affinities.length;
 
-    const equivalentCount = comparableAffinities.filter((a) => a.level === "EQUIVALENT").length;
-    const moderateCount = comparableAffinities.filter((a) => a.level === "MODERATE").length;
-    const totalCount = comparableAffinities.length;
-
-    const score = (equivalentCount * 100 + moderateCount * 60) / totalCount;
+    const score = (equivalentCount * SCORE_WEIGHT_EQUIVALENT + moderateCount * SCORE_WEIGHT_MODERATE) / totalCount;
     return Math.round(score);
   };
 
   const calculateOverallAffinity = (affinities) => {
-    const comparableAffinities = affinities.filter((affinity) => affinity.level !== "CAN ALWAYS BE CONVERTED" && affinity.level !== "");
-
-    const equivalentCount = comparableAffinities.filter((a) => a.level === "EQUIVALENT").length;
-    const lowCount = comparableAffinities.filter((a) => a.level === "LOW").length;
+    const equivalentCount = affinities.filter((a) => a.level === "EQUIVALENT").length;
+    const lowCount = affinities.filter((a) => a.level === "LOW").length;
 
     if (lowCount > 0) {
       return { level: "LOW", color: "danger", breakdown: "Low compatibility" };
     }
 
-    if (equivalentCount === comparableAffinities.length) {
+    if (equivalentCount === affinities.length) {
       return { level: "EQUIVALENT", color: "success", breakdown: "High compatibility" };
     }
 
@@ -196,7 +236,7 @@ const AffinityReportPage = () => {
   const durationAffinity = calculateDurationAffinity(country1.program.duration, country2.program.duration);
   const creditsAffinity = calculateCreditsAffinity(country1.program.totalCredits, country2.program.totalCredits);
   const creditRatioAffinity = calculateCreditRatioAffinity(country1.creditRatio, country2.creditRatio);
-  const gradingAffinity = calculateGradingAffinity(country1.gradingSystem, country2.gradingSystem);
+  const gradingAffinity = calculateGradingAffinity();
   const eqfAffinity = calculateEqfAffinity(country1.program.eqfLevel, country2.program.eqfLevel);
 
   const affinitiesForOverall = [durationAffinity, creditsAffinity, creditRatioAffinity, eqfAffinity];
@@ -240,7 +280,8 @@ const AffinityReportPage = () => {
       category: "GRADING SYSTEM",
       country1Value: country1.gradingSystem,
       country2Value: country2.gradingSystem,
-      affinity: gradingAffinity
+      affinity: gradingAffinity,
+      link: `/grade-comparison?c1=${country1.countryCode}&c2=${country2.countryCode}`
     },
     {
       category: "DEGREE'S OFFICIAL NAME",
@@ -321,9 +362,17 @@ const AffinityReportPage = () => {
                       <td>{row.country2Value}</td>
                       <td>
                         {row.affinity.level && (
-                          <Badge bg={row.affinity.color} className="px-3 py-2 fs-6">
-                            {row.affinity.level}
-                          </Badge>
+                          row.link ? (
+                            <Link to={row.link} style={{ textDecoration: "none" }}>
+                              <Badge bg={row.affinity.color} className="px-3 py-2 fs-6" style={{ cursor: "pointer" }}>
+                                {row.affinity.level}
+                              </Badge>
+                            </Link>
+                          ) : (
+                            <Badge bg={row.affinity.color} className="px-3 py-2 fs-6">
+                              {row.affinity.level}
+                            </Badge>
+                          )
                         )}
                       </td>
                     </tr>

@@ -1,6 +1,6 @@
 # 🎓 EduAtlas - Degree Affinity Report System
 
-![Java](https://img.shields.io/badge/Java-21-orange?style=flat&logo=openjdk) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.5-green?style=flat&logo=springboot) ![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react) ![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat&logo=vite&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=flat&logo=postgresql) ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=flat&logo=bootstrap&logoColor=white) ![Sass](https://img.shields.io/badge/Sass-1.70.0-CC6699?style=flat&logo=sass&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=flat&logo=swagger&logoColor=black)
+![Java](https://img.shields.io/badge/Java-21-orange?style=flat&logo=openjdk) ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.8-green?style=flat&logo=springboot) ![React](https://img.shields.io/badge/React-19-blue?style=flat&logo=react) ![Vite](https://img.shields.io/badge/Vite-7-646CFF?style=flat&logo=vite&logoColor=white) ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=flat&logo=postgresql) ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?style=flat&logo=bootstrap&logoColor=white) ![Sass](https://img.shields.io/badge/Sass-1.70.0-CC6699?style=flat&logo=sass&logoColor=white) ![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=flat&logo=swagger&logoColor=black)
 
 The **EduAtlas Affinity Report System** is a Full Stack Capstone project developed for **Westcliff University**. It addresses a specific administrative challenge: comparing international **Bachelor's degree programs** to determine academic compatibility between different education systems.
 
@@ -16,6 +16,8 @@ The system automates the analysis of degree durations, ECTS credits, credit rati
 | **⚙️ API Docs** | [**Swagger UI (Backend)**](https://extraordinary-greer-ictech-3392249e.koyeb.app/swagger-ui/index.html) | 🟢 Online |
 
 _(Note: The backend is hosted on a free tier. Please allow ~30 seconds for the server to wake up on the first request.)_
+
+> **API Docs note:** Swagger exposes both public and admin endpoints for portfolio review purposes. In a production system, the admin group would be restricted or disabled via `springdoc.swagger-ui.enabled=false`.
 
 ---
 
@@ -33,16 +35,21 @@ _The system generates a detailed comparison table, calculates the affinity score
 
 ![Affinity Report](frontend/public/assets/images/screenshot-report.png)
 
+**3. Grading Scale Comparison**
+_Side-by-side ECTS grade band table (A / B / C / D-E / F) for both selected countries. Accessible from the Grading System row of the affinity report._
+
+![Grading Scale Comparison](frontend/public/assets/images/screenshot-grading.png)
+
 ---
 
 ### 🔐 Admin & Management Flow
 
-**3. Secure Authentication**
+**4. Secure Authentication**
 _A dedicated `/login` portal protects the administrative area using JWT credentials._
 
 ![Login Screen](frontend/public/assets/images/screenshot-login.png)
 
-**4. Admin Backoffice**
+**5. Admin Backoffice**
 _Authenticated admins can browse, search, edit, or delete countries data, bachelor programs data and users data via a comprehensive dashboard._
 
 ![Admin Dashboard](frontend/public/assets/images/screenshot-admin.png)
@@ -64,9 +71,13 @@ The source data was provided as a complex, non-standard Excel matrix. **Instead 
 ## ✨ Key Features
 
 - **Comparison Algorithm:** Calculates compatibility percentages based on Duration, Credits, EQF Level, and Credit Ratios.
+- **Shareable Reports:** Affinity report URL encodes country codes as query params (`?c1=IT&c2=IE`) — paste the URL to reload the exact report.
+- **Grade Comparison Page:** Side-by-side ECTS grade band table for both countries, linked from the report.
 - **Export Tools:** Generate PDF reports using `html2canvas` and `jspdf`.
 - **Secure Admin API:** Full CRUD capabilities protected by Spring Security & JWT.
-- **Feedback System:** Integrated user reporting tool.
+- **Rate Limiting:** Feedback endpoint rate-limited with Bucket4j (3 req/min per IP, 100 req/day globally) to protect the Mailgun free tier.
+- **Feedback System:** Integrated user reporting tool with live Retry-After countdown on 429 responses.
+- **API Documentation:** Swagger UI with bearer token authorization, grouped public/admin specs.
 
 ---
 
@@ -85,16 +96,19 @@ The source data was provided as a complex, non-standard Excel matrix. **Instead 
 
 ### Backend
 
-- **Framework:** Java 21, Spring Boot 3.2
+- **Framework:** Java 21, Spring Boot 3.5.8
 - **Security:** Spring Security, JWT, CORS
 - **Database:** PostgreSQL (Hosted on Koyeb)
-- **Documentation:** OpenAPI 3 (Swagger UI)
+- **Rate Limiting:** Bucket4j 8.10.1
+- **Documentation:** OpenAPI 3 / springdoc-openapi (Swagger UI)
+- **Testing:** JUnit 5, Mockito
 - **Deploy:** Koyeb (Cloud Native Buildpacks)
 
 ### Tools
 
-- **Testing:** Postman
+- **API Testing:** Postman
 - **Version Control:** Git / GitHub
+- **Project Management:** Trello
 
 ---
 

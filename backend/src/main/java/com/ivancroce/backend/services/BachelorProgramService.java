@@ -8,7 +8,7 @@ import com.ivancroce.backend.payloads.BachelorRegistrationDTO;
 import com.ivancroce.backend.repositories.BachelorProgramRepository;
 import com.ivancroce.backend.repositories.CountryRepository;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,13 +21,20 @@ import java.util.Optional;
 
 
 @Service
+@RequiredArgsConstructor
 public class BachelorProgramService {
-@Autowired
-    private BachelorProgramRepository bachelorProgramRepository;
-@Autowired
-    private CountryRepository countryRepository;
 
-public BachelorProgram findById(Long id) {
+    /**
+     * The Bologna Process harmonization constant: a Bachelor's degree is designed to be reachable
+     * after 16 total years of education (primary + secondary + higher). Used to select the
+     * "standard" program duration for a country: standardDuration = 16 - yearsCompulsorySchooling.
+     */
+    public static final int TOTAL_EDUCATION_YEARS = 16;
+
+    private final BachelorProgramRepository bachelorProgramRepository;
+    private final CountryRepository countryRepository;
+
+    public BachelorProgram findById(Long id) {
     return bachelorProgramRepository.findById(id)
             .orElseThrow(() -> new NotFoundException("Bachelor program not found with id: " + id));
 }
@@ -45,7 +52,7 @@ public BachelorProgram findById(Long id) {
     public BachelorProgram getRepresentativeProgramForCountry(Long countryId) {
         // Try the "standard" program first (16 years)
         Optional<BachelorProgram> standardProgram = bachelorProgramRepository
-                .findStandardProgramForCountry(countryId);
+                .findStandardProgramForCountry(countryId, TOTAL_EDUCATION_YEARS);
 
         if (standardProgram.isPresent()) {
             return standardProgram.get();

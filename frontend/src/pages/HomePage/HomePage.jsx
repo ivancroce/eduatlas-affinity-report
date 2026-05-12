@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button, Card, Alert } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import api from "../../../src/api/axios";
+import api from "../../api/axios";
 import { BsArrowLeftRight } from "react-icons/bs";
 import UniversalDropdown from "../../components/UniversalDropdown/UniversalDropdown";
 import StatCounter from "../../components/StatCounter/StatCounter";
@@ -11,7 +11,6 @@ const HomePage = () => {
   const [countries, setCountries] = useState([]);
   const [country1, setCountry1] = useState("");
   const [country2, setCountry2] = useState("");
-  const [isGeneratingReport, setIsGeneratingReport] = useState(false);
   const [isFetchingCountries, setIsFetchingCountries] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ const HomePage = () => {
     }
   };
 
-  const handleGenerateReport = async () => {
+  const handleGenerateReport = () => {
     if (!country1 || !country2) {
       setErrorMessage("Please select both countries");
       return;
@@ -43,38 +42,10 @@ const HomePage = () => {
       return;
     }
 
-    setIsGeneratingReport(true);
+    const c1 = countries.find((c) => c.id.toString() === country1.toString())?.countryCode;
+    const c2 = countries.find((c) => c.id.toString() === country2.toString())?.countryCode;
 
-    try {
-      const [country1Data, country2Data, program1Data, program2Data, special1Data, special2Data] = await Promise.all([
-        api.get(`/countries/${country1}`),
-        api.get(`/countries/${country2}`),
-        api.get(`/countries/${country1}/representative-program`),
-        api.get(`/countries/${country2}/representative-program`),
-        api.get(`/countries/${country1}/has-special-program`),
-        api.get(`/countries/${country2}/has-special-program`)
-      ]);
-
-      navigate("/affinity-report", {
-        state: {
-          country1: {
-            ...country1Data.data,
-            program: program1Data.data,
-            hasSpecialPrograms: special1Data.data
-          },
-          country2: {
-            ...country2Data.data,
-            program: program2Data.data,
-            hasSpecialPrograms: special2Data.data
-          }
-        }
-      });
-    } catch (error) {
-      console.error("Error generating report:", error);
-      setErrorMessage({ type: "danger", text: "Error generating report. Please try again." });
-    } finally {
-      setIsGeneratingReport(false);
-    }
+    navigate(`/affinity-report?c1=${c1}&c2=${c2}`);
   };
 
   return (
@@ -166,19 +137,10 @@ const HomePage = () => {
                     size="lg"
                     className="px-4 py-3 d-none d-sm-inline-block"
                     onClick={handleGenerateReport}
-                    disabled={isGeneratingReport || !country1 || !country2}
+                    disabled={!country1 || !country2}
                   >
-                    {isGeneratingReport ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2"></span>
-                        Generating Report...
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-graph-up me-2"></i>
-                        Generate Affinity Report
-                      </>
-                    )}
+                    <i className="bi bi-graph-up me-2"></i>
+                    Generate Affinity Report
                   </Button>
 
                   <Button
@@ -186,19 +148,10 @@ const HomePage = () => {
                     size="lg"
                     className="px-3 py-3 d-sm-none w-100"
                     onClick={handleGenerateReport}
-                    disabled={isGeneratingReport || !country1 || !country2}
+                    disabled={!country1 || !country2}
                   >
-                    {isGeneratingReport ? (
-                      <>
-                        <span className="spinner-border spinner-border-sm me-2"></span>
-                        Generating...
-                      </>
-                    ) : (
-                      <>
-                        <i className="bi bi-graph-up me-2"></i>
-                        Generate Report
-                      </>
-                    )}
+                    <i className="bi bi-graph-up me-2"></i>
+                    Generate Report
                   </Button>
                 </div>
               </Card.Body>

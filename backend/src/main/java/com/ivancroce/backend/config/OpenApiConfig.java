@@ -1,13 +1,13 @@
 package com.ivancroce.backend.config;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import io.swagger.v3.oas.annotations.info.Info;
-import io.swagger.v3.oas.annotations.servers.Server;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.prepost.PreAuthorize;
 
 @Configuration
 @OpenAPIDefinition(
@@ -15,7 +15,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
                 title = "EduAtlas Affinity Report API",
                 version = "1.0",
                 description = "API for Westcliff University EduAtlas"
-        )
+        ),
+        security = { @SecurityRequirement(name = "bearerAuth") }
+)
+@SecurityScheme(
+        name = "bearerAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "bearer",
+        bearerFormat = "JWT",
+        description = "Paste the access token returned by POST /api/auth/login (without the 'Bearer ' prefix)"
 )
 public class OpenApiConfig {
 
@@ -24,13 +32,16 @@ public class OpenApiConfig {
         return GroupedOpenApi.builder()
                 .group("public")
                 .displayName("Public - Affinity Report")
-                .pathsToMatch("/api/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    if (handlerMethod.hasMethodAnnotation(PreAuthorize.class)) {
-                        return null;
-                    }
-                    return operation;
-                })
+                .pathsToMatch(
+                        "/api/auth/**",
+                        "/api/feedback",
+                        "/api/countries/simple",
+                        "/api/countries/comparison",
+                        "/api/countries/*/representative-program",
+                        "/api/countries/*/has-special-program",
+                        "/api/countries/*"
+                )
+                .pathsToExclude("/api/countries/search")
                 .build();
     }
 
@@ -40,13 +51,14 @@ public class OpenApiConfig {
                 .group("admin")
                 .displayName("Admin - Management")
                 .pathsToMatch("/api/**")
-                .addOperationCustomizer((operation, handlerMethod) -> {
-                    if (handlerMethod.hasMethodAnnotation(PreAuthorize.class) ||
-                            handlerMethod.getBeanType().getSimpleName().contains("Auth")) {
-                        return operation;
-                    }
-                    return null;
-                })
+                .pathsToExclude(
+                        "/api/auth/**",
+                        "/api/feedback",
+                        "/api/countries/simple",
+                        "/api/countries/comparison",
+                        "/api/countries/*/representative-program",
+                        "/api/countries/*/has-special-program"
+                )
                 .build();
     }
 }
